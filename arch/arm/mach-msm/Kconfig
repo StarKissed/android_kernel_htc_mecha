@@ -1247,13 +1247,6 @@ config MSM_NONSMD_PACKET_FILTER
 	  The white TCP port list is updated in attribute
 	  relying on RIL to notify modem.
 
-config MSM_SMD0_WQ
-	bool "SMD0 TTY Workqueue"
-	depends on (ARCH_MSM8X60)
-	default y
-	help
-	  Independent tty workqueue for SMD0
-
 config MSM_RPC_LOOPBACK_XPRT
 	depends on MSM_ONCRPCROUTER
 	default n
