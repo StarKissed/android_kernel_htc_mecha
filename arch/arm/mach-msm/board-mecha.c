@@ -35,6 +35,7 @@
 #include <linux/cm3628.h>
 #include <linux/lightsensor.h>
 #include <linux/atmel_qt602240.h>
+//#include <linux/input/mxt224.h>
 #include <linux/pmic8058-pwm.h>
 #include <linux/leds-pm8058.h>
 #include <linux/input/pmic8058-keypad.h>
@@ -910,6 +911,105 @@ struct atmel_i2c_platform_data mecha_ts_atmel_data[] = {
 	},
 };
 
+//static int mxt224_power(int on)
+//{
+//	pr_info("%s: power %d\n", __func__, on);
+//    
+//	if (on == 1) {
+//		gpio_set_value(PM8058_GPIO_PM_TO_SYS(MECHA_TP_RSTz), 1);
+//	} else if (on == 2) {
+//		gpio_set_value(PM8058_GPIO_PM_TO_SYS(MECHA_TP_RSTz), 0);
+//		msleep(5);
+//		gpio_set_value(PM8058_GPIO_PM_TO_SYS(MECHA_TP_RSTz), 1);
+//		msleep(40);
+//	}
+//    
+//	return 0;
+//}
+//
+//
+//static u8 t6_config[] = {GEN_COMMANDPROCESSOR_T6,
+//    0, 0, 0, 0, 0, 0};
+//static u8 t7_config[] = {GEN_POWERCONFIG_T7,
+//    50, 15, 25};
+//static u8 t8_config[] = {GEN_ACQUISITIONCONFIG_T8,
+//    10, 0, 20, 10, 0, 0, 5, 15};
+//static u8 t9_config[] = {TOUCH_MULTITOUCHSCREEN_T9,
+//    139, 0, 0, 18, 12, 0, 16, 38, 3, 7, 0, 5, 2,
+//    15, 2, 10, 25, 5, 0, 0,
+//    0, 0, 0, 0, 0, 0, 159, 47, 149, 81, 40};
+//static u8 t15_config[] = {TOUCH_KEYARRAY_T15,
+//    0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
+//static u8 t18_config[] = {SPT_COMCONFIG_T18,
+//    0, 1};
+//static u8 t19_config[] = {SPT_GPIOPWM_T19,
+//    0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0}; 
+//static u8 t20_config[] = {PROCI_GRIPFACESUPPRESSION_T20,
+//    7, 0, 0, 0, 0, 0, 0, 80, 40, 4, 35, 10};
+//static u8 t22_config[] = {PROCG_NOISESUPPRESSION_T22,
+//    15, 0, 0, 0, 0, 0, 0, 0, 16, 0, 1, 0, 7, 18,
+//    25, 30, 0};
+//static u8 t23_config[] = {TOUCH_PROXIMITY_T23,
+//    0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
+//static u8 t24_config[] = {PROCI_ONETOUCHGESTUREPROCESSOR_T24,
+//    0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
+//static u8 t25_config[] = {SPT_SELFTEST_T25, 
+//    3, 0, 200, 50, 64, 31, 0, 0, 0, 0, 0, 0, 0, 0};
+//static u8 t27_config[] = {PROCI_TWOTOUCHGESTUREPROCESSOR_T27,
+//    0, 0, 0, 0, 0, 0, 0};
+//static u8 t28_config[] = {SPT_CTECONFIG_T28,
+//    0, 0, 2, 4, 8, 60};
+//static u8 end_config[] = {RESERVED_T255};
+//
+//static const u8 *mxt224_config[] = {
+//	t6_config,
+//	t7_config,
+//	t8_config,
+//	t9_config,
+//	t15_config,
+//	t18_config,
+//	t19_config,
+//	t20_config,
+//	t22_config,
+//	t23_config,
+//	t24_config,
+//	t25_config,
+//	t27_config,
+//	t28_config,
+//	end_config,
+//};
+//
+//static struct mxt224_platform_data mxt224_data = {
+//	.max_finger_touches = 2,
+//	.gpio_read_done = MECHA_GPIO_TP_INT_N,
+//	.config = mxt224_config,
+//	.min_x = 1,
+//	.max_x = 1023,
+//	.min_y = 2,
+//	.max_y = 966,
+//	.min_z = 0,
+//	.max_z = 255,
+//	.min_w = 0,
+//	.max_w = 20,
+//	.power = mxt224_power,
+//};
+//
+//
+//
+//static void mxt224_init(void)
+//{
+//	printk(KERN_INFO "mxt224: entered mxt224_init\n");
+//	mxt224_data.max_y = 966;
+//	//t9_config[8] = 38;
+//	//t9_config[9] = 3;
+//	//t9_config[23] = 0;
+//	//t9_config[24] = 0;
+//	//t9_config[27] = 159;
+//	//t9_config[28] = 47;
+//	//t9_config[29] = 149;
+//	//t9_config[30] = 81;
+//}
+
 static int mecha_smsc251x_switch_register(int (*callback)(uint8_t hub_enable))
 {
 	if (mecha_smsc251x_switch_cb)
@@ -941,6 +1041,11 @@ static struct i2c_board_info i2c_devices[] = {
 		.platform_data = &mecha_ts_atmel_data,
 		.irq = MSM_GPIO_TO_INT(MECHA_GPIO_TP_INT_N)
 	},
+    //    {
+    //		I2C_BOARD_INFO(MXT224_DEV_NAME, 0x94 >> 1),
+    //		.platform_data = &mxt224_data,
+    //		.irq = MSM_GPIO_TO_INT(MECHA_GPIO_TP_INT_N)
+    //	},
 	{
 		I2C_BOARD_INFO(TPA2051D3_I2C_NAME, 0xE0 >> 1),
 		.platform_data = &tpa2051d3_platform_data,
@@ -2284,95 +2389,8 @@ static struct platform_device mecha_flashlight_device = {
 	},
 };
 
-#if defined(CONFIG_SERIAL_MSM_HS) && defined(CONFIG_SERIAL_MSM_HS_PURE_ANDROID)
-static struct msm_serial_hs_platform_data msm_uart_dm1_pdata = {
-        .rx_wakeup_irq = -1,
-        .inject_rx_on_wakeup = 0,
-        .exit_lpm_cb = bcm_bt_lpm_exit_lpm_locked,
-};
-
-static struct bcm_bt_lpm_platform_data bcm_bt_lpm_pdata = {
-        .gpio_wake = MECHA_GPIO_BT_CHIP_WAKE,
-        .gpio_host_wake = MECHA_GPIO_BT_HOST_WAKE,
-        .request_clock_off_locked = msm_hs_request_clock_off_locked,
-        .request_clock_on_locked = msm_hs_request_clock_on_locked,
-};
-
-struct platform_device bcm_bt_lpm_device = {
-        .name = "bcm_bt_lpm",
-        .id = 0,
-        .dev = {
-                .platform_data = &bcm_bt_lpm_pdata,
-        },
-};
-
-#define ATAG_BDADDR 0x43294329  /* mahimahi bluetooth address tag */
-#define ATAG_BDADDR_SIZE 4
-#define BDADDR_STR_SIZE 18
-
-static char bdaddr[BDADDR_STR_SIZE];
-
-module_param_string(bdaddr, bdaddr, sizeof(bdaddr), 0400);
-MODULE_PARM_DESC(bdaddr, "bluetooth address");
-
-static int __init parse_tag_bdaddr(const struct tag *tag)
-{
-        unsigned char *b = (unsigned char *)&tag->u;
-
-        if (tag->hdr.size != ATAG_BDADDR_SIZE)
-                return -EINVAL;
-
-        snprintf(bdaddr, BDADDR_STR_SIZE, "%02X:%02X:%02X:%02X:%02X:%02X",
-                b[0], b[1], b[2], b[3], b[4], b[5]);
-
-        return 0;
-}
-
-__tagtable(ATAG_BDADDR, parse_tag_bdaddr);
-
-#elif defined(CONFIG_SERIAL_MSM_HS)
-static struct msm_serial_hs_platform_data msm_uart_dm1_pdata = {
-        .rx_wakeup_irq = MSM_GPIO_TO_INT(MECHA_GPIO_BT_HOST_WAKE),
-        .inject_rx_on_wakeup = 0,
-        .cpu_lock_supported = 1,
-
-        /* for bcm */
-        .bt_wakeup_pin_supported = 1,
-        .bt_wakeup_pin = MECHA_GPIO_BT_CHIP_WAKE,
-        .host_wakeup_pin = MECHA_GPIO_BT_HOST_WAKE,
-};
-
-/* for bcm */
-static char bdaddress[20];
-extern unsigned char *get_bt_bd_ram(void);
-
-static void bt_export_bd_address(void)
-{
-        unsigned char cTemp[6];
-
-        memcpy(cTemp, get_bt_bd_ram(), 6);
-        sprintf(bdaddress, "%02x:%02x:%02x:%02x:%02x:%02x",
-                cTemp[0], cTemp[1], cTemp[2], cTemp[3], cTemp[4], cTemp[5]);
-        printk(KERN_INFO "YoYo--BD_ADDRESS=%s\n", bdaddress);
-}
-
-module_param_string(bdaddress, bdaddress, sizeof(bdaddress), S_IWUSR | S_IRUGO);
-MODULE_PARM_DESC(bdaddress, "BT MAC ADDRESS");
-
-static char bt_chip_id[10] = "bcm4329";
-module_param_string(bt_chip_id, bt_chip_id, sizeof(bt_chip_id), S_IWUSR | S_IRUGO);
-MODULE_PARM_DESC(bt_chip_id, "BT's chip id");
-
-static char bt_fw_version[10] = "v2.0.38";
-module_param_string(bt_fw_version, bt_fw_version, sizeof(bt_fw_version), S_IWUSR | S_IRUGO);
-MODULE_PARM_DESC(bt_fw_version, "BT's fw version");
-#endif
-
 static struct platform_device *devices[] __initdata = {
 	&msm_device_uart3,
-#ifdef CONFIG_SERIAL_MSM_HS_PURE_ANDROID
-        &bcm_bt_lpm_device,
-#endif
 	&msm_device_smd,
 	&mecha_rfkill,
 #ifdef CONFIG_I2C_SSBI
@@ -2437,7 +2455,6 @@ static struct platform_device *devices_Lightsensor[] __initdata = {
 #endif
 };
 
-#if 0
 #ifdef CONFIG_SERIAL_MSM_HS
 static struct msm_serial_hs_platform_data msm_uart_dm1_pdata = {
 	.rx_wakeup_irq = MSM_GPIO_TO_INT(MECHA_GPIO_BT_HOST_WAKE),
@@ -2476,7 +2493,6 @@ MODULE_PARM_DESC(bt_chip_id, "BT's chip id");
 static char bt_fw_version[10] = "v2.0.38";
 module_param_string(bt_fw_version, bt_fw_version, sizeof(bt_fw_version), S_IWUSR | S_IRUGO);
 MODULE_PARM_DESC(bt_fw_version, "BT's fw version");
-#endif
 
 static struct msm_i2c_device_platform_data msm_i2c_pdata = {
 	.i2c_clock = 100000,
@@ -2683,6 +2699,7 @@ static ssize_t mecha_virtual_keys_show(struct kobject *kobj,
 		"\n");
 }
 
+
 static struct kobj_attribute mecha_virtual_keys_attr = {
 	.attr = {
 		.name = "virtualkeys.atmel-touchscreen",
@@ -2690,6 +2707,14 @@ static struct kobj_attribute mecha_virtual_keys_attr = {
 	},
 	.show = &mecha_virtual_keys_show,
 };
+
+//static struct kobj_attribute mecha_virtual_keys_attr = {
+//	.attr = {
+//		.name = "virtualkeys.mxt224_ts_input",
+//		.mode = S_IRUGO,
+//	},
+//	.show = &mecha_virtual_keys_show,
+//};
 
 static struct attribute *mecha_properties_attrs[] = {
 	&mecha_virtual_keys_attr.attr,
@@ -2729,10 +2754,8 @@ static void __init mecha_init(void)
 	msm_clock_init();
 	mdm2ap_status_gpio_init();
 
-#ifndef CONFIG_SERIAL_MSM_HS_PURE_ANDROID
 	/* for bcm */
 	bt_export_bd_address();
-#endif
 
 #if defined(CONFIG_MSM_SERIAL_DEBUGGER)
 	if (!opt_disable_uart3)
@@ -2742,9 +2765,7 @@ static void __init mecha_init(void)
 
 #ifdef CONFIG_SERIAL_MSM_HS
 	msm_device_uart_dm1.dev.platform_data = &msm_uart_dm1_pdata;
-#ifndef CONFIG_SERIAL_MSM_HS_PURE_ANDROID
 	msm_device_uart_dm1.name = "msm_serial_hs_bcm";	/* for bcm */
-#endif
 	msm_add_serial_devices(3);
 #else
 	msm_add_serial_devices(0);
@@ -2832,6 +2853,8 @@ static void __init mecha_init(void)
 		mecha_ts_atmel_data[0].config_T9[3] = 18;
 		mecha_ts_atmel_data[0].config_T9[4] = 12;
 	}
+    
+    //    mxt224_init();
 
 	i2c_register_board_info(0, i2c_devices, ARRAY_SIZE(i2c_devices));
 
