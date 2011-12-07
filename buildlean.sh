@@ -5,7 +5,7 @@ TOOLCHAIN_PREFIX=arm-none-eabi-
 
 export USE_CCACHE=1
 export CCACHE_DIR=/Users/TwistedZero/.ccache
-../prebuilt/darwin-x86/ccache/ccache -M 20G
+../../prebuilt/darwin-x86/ccache/ccache -M 20G
 
 make clean -j$CPU_JOB_NUM
 
