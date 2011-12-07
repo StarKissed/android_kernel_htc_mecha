@@ -476,6 +476,10 @@ static int capella_cm3628_power(int pwr_device, uint8_t enable);
 		.name = "green",
 		.type = LED_RGB,
 	},
+ 	{
+ 		.name = "blue",
+ 		.type = LED_RGB,
+ 	},
 	{
 		.name = "button-backlight",
 		.type = LED_PWM,
