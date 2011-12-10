@@ -72,7 +72,8 @@ on boot
 
 	# for wireless modem
 	chown system system /sys/module/serial/parameters/modem_enabled
-	chown system system /dev/ttyHSUSB0
+	chown bluetooth bluetooth /dev/ttyHS0
+	chmod 0770 /dev/ttyHS0
 	chown system system /dev/ttySA0
 	chown system system /dev/smd9
 

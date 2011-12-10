@@ -1,12 +1,11 @@
 #!/bin/sh
 
-CPU_JOB_NUM=8
+CPU_JOB_NUM=16
 TOOLCHAIN_PREFIX=arm-none-eabi-
 
 export USE_CCACHE=1
 export CCACHE_DIR=/Users/TwistedZero/.ccache
-../../prebuilt/darwin-x86/ccache/ccache -M 20G
-
+prebuilt/darwin-x86/ccache/ccache -M 40G
 make clean -j$CPU_JOB_NUM
 
 if [ $3 ]; then
@@ -25,6 +24,9 @@ sed -i "s/^.*UNLOCK_184.*$/CONFIG_UNLOCK_184MHZ=y/" .config
 zipfile="imoseyon_leanKernel_184Mhz_v${2}AOSP${suffix}.zip"
 fi
 
+export USE_CCACHE=1
+export CCACHE_DIR=/Users/TwistedZero/.ccache
+prebuilt/darwin-x86/ccache/ccache -M 40G
 make -j$CPU_JOB_NUM ARCH=arm CROSS_COMPILE=$TOOLCHAIN_PREFIX
 
 # make nsio module here for now
@@ -60,6 +62,32 @@ fi
 cp fs/cifs/cifs.ko zip.aosp/system/lib/modules
 cp arch/arm/boot/zImage mkboot.aosp/
 cp .config arch/arm/configs/lean_aosp_defconfig
+
+echo "adding to build"
+
+if [ ! -e ../../device/htc/mecha/kernel ]; then
+mkdir ../../device/htc/mecha/kernel
+fi
+if [ ! -e ../../device/htc/mecha/kernel/modules ]; then
+mkdir ../../device/htc/mecha/kernel/modules
+fi
+if [ ! -e ../../vendor/twisted/prebuilt/lib ]; then
+mkdir ../../vendor/twisted/prebuilt/lib
+fi
+if [ ! -e ../../vendor/twisted/prebuilt/lib/modules ]; then
+mkdir ../../vendor/twisted/prebuilt/lib/modules
+fi
+
+cp -R drivers/net/wireless/bcm4329/bcm4329.ko ../../device/htc/mecha/kernel/modules
+cp -R drivers/net/tun.ko ../../vendor/twisted/prebuilt/lib/modules
+cp -R drivers/staging/zram/zram.ko ../../vendor/twisted/prebuilt/lib/modules
+cp -R lib/lzo/lzo_decompress.ko ../../vendor/twisted/prebuilt/lib/modules
+cp -R lib/lzo/lzo_compress.ko ../../vendor/twisted/prebuilt/lib/modules
+if [ ! -e nsio*/*.ko ]; then
+cp -R nsio*/*.ko ../../vendor/twisted/prebuilt/lib/modules
+fi
+cp -R fs/cifs/cifs.ko ../../vendor/twisted/prebuilt/lib/modules
+cp -R arch/arm/boot/zImage ../../device/htc/mecha/kernel/kernel
 
 cd mkboot.aosp
 echo "making boot image"
