@@ -82,6 +82,7 @@ on boot
     chown system system /sys/module/smsc251x/parameters/hub_enabled
 
 service ril-ims-daemon /system/bin/rild_ims
+    class main
     socket rild-ims stream 660 root radio
     user root
     group radio cache inet misc audio
