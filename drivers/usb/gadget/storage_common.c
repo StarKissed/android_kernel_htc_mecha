@@ -232,7 +232,6 @@ struct interrupt_data {
 #define SC_WRITE_6			0x0a
 #define SC_WRITE_10			0x2a
 #define SC_WRITE_12			0xaa
-#define SC_PASCAL_MODE		0xff
 
 /* SCSI Sense Key/Additional Sense Code/ASC Qualifier values */
 #define SS_NO_SENSE				0
@@ -290,8 +289,12 @@ static struct fsg_lun *fsg_lun_from_dev(struct device *dev)
 #define EP0_BUFSIZE	256
 #define DELAYED_STATUS	(EP0_BUFSIZE + 999)	/* An impossibly large value */
 
-/* Number of buffers we will use.  2 is enough for double-buffering */
-#define FSG_NUM_BUFFERS	8
+/* Number of buffers for CBW, DATA and CSW */
+#ifdef CONFIG_USB_CSW_HACK
+#define FSG_NUM_BUFFERS	4
+#else
+#define FSG_NUM_BUFFERS	2
+#endif
 
 /* Default size of buffer length. */
 #define FSG_BUFLEN	((u32)16384)
@@ -652,16 +655,10 @@ static void fsg_lun_close(struct fsg_lun *curlun)
 static int fsg_lun_fsync_sub(struct fsg_lun *curlun)
 {
 	struct file	*filp = curlun->filp;
-	int ret = 0;
 
 	if (curlun->ro || !filp)
 		return 0;
-
-	printk(KERN_DEBUG "vfs_fsync++\n");
-	ret = vfs_fsync(filp, 1);
-	printk(KERN_DEBUG "vfs_fsync--\n");
-
-	return ret;
+	return vfs_fsync(filp, 1);
 }
 
 static void store_cdrom_address(u8 *dest, int msf, u32 addr)
@@ -758,7 +755,6 @@ static ssize_t fsg_store_file(struct device *dev, struct device_attribute *attr,
 	int		rc = 0;
 
 
-	printk(KERN_INFO "[USB] store_file: \"%s\"\n", buf);
 #ifndef CONFIG_USB_ANDROID_MASS_STORAGE
 	/* disabled in android because we need to allow closing the backing file
 	 * if the media was removed
