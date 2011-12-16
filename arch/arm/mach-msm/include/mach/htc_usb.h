@@ -34,12 +34,6 @@ static char *usb_functions_adb[] = {
 	"adb",
 };
 
-#ifdef CONFIG_USB_ANDROID_ECM
-static char *usb_functions_ecm[] = {
-	"cdc_ethernet",
-};
-#endif
-#ifdef CONFIG_USB_ANDROID_RNDIS
 static char *usb_functions_rndis[] = {
 	"rndis",
 };
@@ -57,7 +51,6 @@ static char *usb_functions_rndis_adb_diag[] = {
 	"adb",
 	"diag",
 };
-#endif
 #endif
 
 #ifdef CONFIG_USB_G_ANDROID_ACCESSORY
@@ -85,66 +78,6 @@ static char *usb_functions_adb_diag[] = {
 	"usb_mass_storage",
 	"adb",
 	"diag",
-};
-#endif
-
-#ifdef CONFIG_USB_ANDROID_SERIAL
-static char *usb_functions_modem[] = {
-	"usb_mass_storage",
-	"modem",
-};
-static char *usb_functions_adb_modem[] = {
-	"usb_mass_storage",
-	"adb",
-	"modem",
-};
-#ifdef CONFIG_USB_ANDROID_DIAG
-static char *usb_functions_diag_modem[] = {
-	"usb_mass_storage",
-	"diag",
-	"modem",
-};
-static char *usb_functions_adb_diag_modem[] = {
-	"usb_mass_storage",
-	"adb",
-	"diag",
-	"modem",
-};
-static char *usb_functions_adb_diag_serial[] = {
-	"usb_mass_storage",
-	"adb",
-	"diag",
-	"serial",
-};
-static char *usb_functions_diag_serial[] = {
-	"usb_mass_storage",
-	"diag",
-	"serial",
-};
-static char *usb_functions_adb_diag_serial_modem[] = {
-	"usb_mass_storage",
-	"adb",
-	"diag",
-	"modem",
-	"serial",
-};
-static char *usb_functions_diag_serial_modem[] = {
-	"usb_mass_storage",
-	"diag",
-	"modem",
-	"serial",
-};
-#endif
-#endif
-
-#ifdef CONFIG_USB_ANDROID_ACM
-static char *usb_functions_adb_acm[] = {
-	"usb_mass_storage",
-	"adb",
-	"acm",
-};
-static char *usb_functions_acm[] = {
-	"acm",
 };
 #endif
 
@@ -176,7 +109,6 @@ static struct android_usb_product usb_products[] = {
 		.num_functions	= ARRAY_SIZE(usb_functions_ums),
 		.functions	= usb_functions_ums,
 	},
-#ifdef CONFIG_USB_ANDROID_RNDIS
 	{
 		.product_id	= 0x0ffe,
 		.num_functions	= ARRAY_SIZE(usb_functions_rndis),

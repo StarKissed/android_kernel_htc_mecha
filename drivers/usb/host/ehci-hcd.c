@@ -1025,7 +1025,7 @@ rescan:
 		/* periodic qh self-unlinks on empty */
 		if (!tmp)
 			goto nogood;
-		unlink_async (ehci, qh);
+		unlink_async(ehci, qh);
 		/* FALL THROUGH */
 	case QH_STATE_UNLINK:		/* wait for hw to finish? */
 	case QH_STATE_UNLINK_WAIT:
@@ -1159,6 +1159,11 @@ MODULE_LICENSE ("GPL");
 #ifdef CONFIG_ARCH_IXP4XX
 #include "ehci-ixp4xx.c"
 #define	PLATFORM_DRIVER		ixp4xx_ehci_driver
+#endif
+
+#ifdef CONFIG_USB_EHCI_MSM
+#include "ehci-msm.c"
+#define PLATFORM_DRIVER		ehci_msm_driver
 #endif
 
 #ifdef CONFIG_USB_W90X900_EHCI
