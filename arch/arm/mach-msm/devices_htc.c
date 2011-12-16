@@ -151,8 +151,13 @@ static struct resource resources_hw3d[] = {
 		.name	= "ebi",
 	},
 	{
+#ifdef CONFIG_ARCH_MSM7X30
+        .start  = INT_GRP_3D,
+        .end    = INT_GRP_3D,
+#else
 		.start	= INT_GRAPHICS,
 		.end	= INT_GRAPHICS,
+#endif
 		.flags	= IORESOURCE_IRQ,
 		.name	= "gfx",
 	},
