@@ -25,7 +25,6 @@
 #include <linux/mutex.h>
 #include <linux/freezer.h>
 #include <linux/pm_runtime.h>
-#include <linux/usb/otg.h>
 
 #include <asm/uaccess.h>
 #include <asm/byteorder.h>
@@ -712,10 +711,6 @@ static void hub_activate(struct usb_hub *hub, enum hub_activation_type type)
 		 */
 		if (type == HUB_INIT) {
 			delay = hub_power_on(hub, false);
-#ifdef CONFIG_USB_OTG
-			if (hdev->bus->is_b_host)
-				goto init2;
-#endif
 			PREPARE_DELAYED_WORK(&hub->init_work, hub_init_func2);
 			schedule_delayed_work(&hub->init_work,
 					msecs_to_jiffies(delay));
@@ -1270,7 +1265,6 @@ static int hub_probe(struct usb_interface *intf, const struct usb_device_id *id)
 #ifdef	CONFIG_USB_OTG_BLACKLIST_HUB
 	if (hdev->parent) {
 		dev_warn(&intf->dev, "ignoring external hub\n");
-		otg_send_event(OTG_EVENT_HUB_NOT_SUPPORTED);
 		return -ENODEV;
 	}
 #endif
@@ -1607,13 +1601,6 @@ void usb_disconnect(struct usb_device **pdev)
 	usb_set_device_state(udev, USB_STATE_NOTATTACHED);
 	dev_info (&udev->dev, "USB disconnect, address %d\n", udev->devnum);
 
-#ifdef CONFIG_USB_OTG
-	if (udev->bus->hnp_support && udev->portnum == udev->bus->otg_port) {
-		cancel_delayed_work(&udev->bus->hnp_polling);
-		udev->bus->hnp_support = 0;
-	}
-#endif
-
 	usb_lock_device(udev);
 
 	/* Free up all the children before we remove this device */
@@ -1718,30 +1705,15 @@ static int usb_enumerate_device_otg(struct usb_device *udev)
 					(port1 == bus->otg_port)
 						? "" : "non-");
 
-				/* a_alt_hnp_support is obsoleted */
-				if (port1 != bus->otg_port)
-					goto out;
-
-				bus->hnp_support = 1;
-
-				/* a_hnp_support is not required for devices
-				 * compliant to revision 2.0 or subsequent
-				 * versions.
-				 */
-				if (le16_to_cpu(desc->bcdOTG) >= 0x0200)
-					goto out;
-
-				/* Legacy B-device i.e compliant to spec
-				 * revision 1.3 expect A-device to set
-				 * a_hnp_support or b_hnp_enable before
-				 * selecting configuration.
-				 */
-
 				/* enable HNP before suspend, it's simpler */
+				if (port1 == bus->otg_port)
+					bus->b_hnp_enable = 1;
 				err = usb_control_msg(udev,
 					usb_sndctrlpipe(udev, 0),
 					USB_REQ_SET_FEATURE, 0,
-					USB_DEVICE_A_HNP_SUPPORT,
+					bus->b_hnp_enable
+						? USB_DEVICE_B_HNP_ENABLE
+						: USB_DEVICE_A_ALT_HNP_SUPPORT,
 					0, NULL, 0, USB_CTRL_SET_TIMEOUT);
 				if (err < 0) {
 					/* OTG MESSAGE: report errors here,
@@ -1750,35 +1722,26 @@ static int usb_enumerate_device_otg(struct usb_device *udev)
 					dev_info(&udev->dev,
 						"can't set HNP mode: %d\n",
 						err);
-					bus->hnp_support = 0;
+					bus->b_hnp_enable = 0;
 				}
 			}
 		}
 	}
-out:
-	if (!is_targeted(udev)) {
 
-		otg_send_event(OTG_EVENT_DEV_NOT_SUPPORTED);
+	if (!is_targeted(udev)) {
 
 		/* Maybe it can talk to us, though we can't talk to it.
 		 * (Includes HNP test device.)
 		 */
-		if (udev->bus->hnp_support) {
+		if (udev->bus->b_hnp_enable || udev->bus->is_b_host) {
 			err = usb_port_suspend(udev, PMSG_SUSPEND);
 			if (err < 0)
 				dev_dbg(&udev->dev, "HNP fail, %d\n", err);
 		}
 		err = -ENOTSUPP;
-	} else if (udev->bus->hnp_support &&
-		udev->portnum == udev->bus->otg_port) {
-		/* HNP polling is introduced in OTG supplement Rev 2.0
-		 * and older devices may not support. Work is not
-		 * re-armed if device returns STALL. B-Host also perform
-		 * HNP polling.
-		 */
-		schedule_delayed_work(&udev->bus->hnp_polling,
-			msecs_to_jiffies(THOST_REQ_POLL));
+		goto fail;
 	}
+fail:
 #endif
 	return err;
 }
@@ -2257,22 +2220,6 @@ int usb_port_suspend(struct usb_device *udev, pm_message_t msg)
 				return status;
 		}
 	}
-#ifdef CONFIG_USB_OTG
-	if (!udev->bus->is_b_host && udev->bus->hnp_support &&
-		udev->portnum == udev->bus->otg_port) {
-		status = usb_control_msg(udev, usb_sndctrlpipe(udev, 0),
-				USB_REQ_SET_FEATURE, 0,
-				USB_DEVICE_B_HNP_ENABLE,
-				0, NULL, 0, USB_CTRL_SET_TIMEOUT);
-		if (status < 0) {
-			otg_send_event(OTG_EVENT_NO_RESP_FOR_HNP_ENABLE);
-			dev_dbg(&udev->dev, "can't enable HNP on port %d, "
-					"status %d\n", port1, status);
-		} else {
-			udev->bus->b_hnp_enable = 1;
-		}
-	}
-#endif
 
 	/* see 7.1.7.6 */
 	status = set_port_feature(hub->hdev, port1, USB_PORT_FEAT_SUSPEND);
