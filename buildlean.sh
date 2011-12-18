@@ -34,31 +34,6 @@ cd ..
 
 find . -name "*.ko" | xargs ${TOOLCHAIN_PREFIX}strip --strip-unneeded
 
-if [ ! -e zip.aosp ]; then
-mkdir zip.aosp
-fi
-if [ ! -e zip.aosp/system ]; then
-mkdir zip.aosp/system
-fi
-if [ ! -e zip.aosp/system/lib ]; then
-mkdir zip.aosp/system/lib
-fi
-if [ ! -e zip.aosp/system/lib/modules ]; then
-mkdir zip.aosp/system/lib/modules
-else
-rm -r zip.aosp/system/lib/modules
-mkdir zip.aosp/system/lib/modules
-fi
-cp drivers/net/wireless/bcm4329/bcm4329.ko zip.aosp/system/lib/modules
-cp drivers/net/tun.ko zip.aosp/system/lib/modules
-cp drivers/staging/zram/zram.ko zip.aosp/system/lib/modules
-cp lib/lzo/lzo_decompress.ko zip.aosp/system/lib/modules
-cp lib/lzo/lzo_compress.ko zip.aosp/system/lib/modules
-if [ ! -e nsio*/*.ko ]; then
-cp nsio*/*.ko zip.aosp/system/lib/modules
-fi
-cp fs/cifs/cifs.ko zip.aosp/system/lib/modules
-cp arch/arm/boot/zImage mkboot.aosp/
 cp .config arch/arm/configs/lean_aosp_defconfig
 
 if [ ! $3 ]; then
@@ -87,6 +62,32 @@ cp -R fs/cifs/cifs.ko ../../device/htc/mecha/kernel/lib/modules
 cp -R arch/arm/boot/zImage ../../device/htc/mecha/kernel/kernel
 
 else
+
+if [ ! -e zip.aosp ]; then
+mkdir zip.aosp
+fi
+if [ ! -e zip.aosp/system ]; then
+mkdir zip.aosp/system
+fi
+if [ ! -e zip.aosp/system/lib ]; then
+mkdir zip.aosp/system/lib
+fi
+if [ ! -e zip.aosp/system/lib/modules ]; then
+mkdir zip.aosp/system/lib/modules
+else
+rm -r zip.aosp/system/lib/modules
+mkdir zip.aosp/system/lib/modules
+fi
+cp drivers/net/wireless/bcm4329/bcm4329.ko zip.aosp/system/lib/modules
+cp drivers/net/tun.ko zip.aosp/system/lib/modules
+cp drivers/staging/zram/zram.ko zip.aosp/system/lib/modules
+cp lib/lzo/lzo_decompress.ko zip.aosp/system/lib/modules
+cp lib/lzo/lzo_compress.ko zip.aosp/system/lib/modules
+if [ ! -e nsio*/*.ko ]; then
+cp nsio*/*.ko zip.aosp/system/lib/modules
+fi
+cp fs/cifs/cifs.ko zip.aosp/system/lib/modules
+cp arch/arm/boot/zImage mkboot.aosp/
 
 cd mkboot.aosp
 echo "making boot image"
