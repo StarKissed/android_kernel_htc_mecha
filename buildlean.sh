@@ -1,31 +1,40 @@
 #!/bin/sh
 
+BUILDDIR=/Volumes/android/android-tzb_ics4.0.1
+CCACHEBIN=prebuilt/darwin-x86/ccache/ccache
+KERNELSPEC=leanKernel-tbolt-ics
+USERLOCAL=/Users/TwistedZero
+DROPBOX=/Users/TwistedZero/Dropbox/IceCreamSammy
+HANDLE=TwistedZero
+
 CPU_JOB_NUM=16
 TOOLCHAIN_PREFIX=arm-none-eabi-
 
 export USE_CCACHE=1
-export CCACHE_DIR=/Users/TwistedZero/.ccache
-../../prebuilt/darwin-x86/ccache/ccache -M 40G
+export CCACHE_DIR=$USERLOCAL/.ccache/kernel
+../../$CCACHEBIN -M 40G
 make clean -j$CPU_JOB_NUM
+rm -R $CCACHE_DIR/*
 
 if [ $2 ]; then
 cp -R config/${2} .config
 fi
 
-sed -i s/CONFIG_LOCALVERSION=\"-imoseyon-.*\"/CONFIG_LOCALVERSION=\"-imoseyon-${3}AOSP\"/ .config
+sed -i s/CONFIG_LOCALVERSION=\"-imoseyon-.*\"/CONFIG_LOCALVERSION=\"-imoseyon-AOSP\"/ .config
 
 if [ $1 -eq 2 ]; then
 sed -i "s/^.*UNLOCK_184.*$/CONFIG_UNLOCK_184MHZ=n/" .config
-zipfile="imoseyon_leanKernel_v${3}AOSP.zip"
+zipfile="imoseyon_leanKernel_AOSP.zip"
 else
 sed -i "s/^.*UNLOCK_184.*$/CONFIG_UNLOCK_184MHZ=y/" .config
-zipfile="imoseyon_leanKernel_184Mhz_v${3}AOSP.zip"
+zipfile="imoseyon_leanKernel_184Mhz_AOSP.zip"
 fi
 
 export USE_CCACHE=1
-export CCACHE_DIR=/Users/TwistedZero/.ccache
-../../prebuilt/darwin-x86/ccache/ccache -M 40G
+export CCACHE_DIR=$USERLOCAL/.ccache/kernel
+../../$CCACHEBIN -M 40G
 make -j$CPU_JOB_NUM ARCH=arm CROSS_COMPILE=$TOOLCHAIN_PREFIX
+rm -R $CCACHE_DIR/*
 
 # make nsio module here for now
 cd nsio*
@@ -100,5 +109,6 @@ rm *.zip
 zip -r $zipfile *
 rm /tmp/*.zip
 cp *.zip /tmp
+cp -R $BUILDDIR/kernel/$KERNELSPEC/$zipfile $DROPBOX/$zipfile
 
 fi
