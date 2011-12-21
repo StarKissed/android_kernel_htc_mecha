@@ -30,7 +30,7 @@
 #define _MSM_KGSL_H
 
 #define KGSL_VERSION_MAJOR        3
-#define KGSL_VERSION_MINOR        8
+#define KGSL_VERSION_MINOR        2
 
 /*context flags */
 #define KGSL_CONTEXT_SAVE_GMEM	1
