@@ -94,6 +94,7 @@
 
 #define PMIC_GPIO_INT		27
 
+static unsigned kernel_flag;
 unsigned int engineerid;
 
 #ifdef CONFIG_MICROP_COMMON
@@ -152,6 +153,22 @@ static struct platform_device usb_mass_storage_device = {
 		.platform_data = &mass_storage_pdata,
 	},
 };
+
+#ifdef CONFIG_USB_ANDROID_RNDIS
+static struct usb_ether_platform_data rndis_pdata = {
+	/* ethaddr is filled by board_serialno_setup */
+	.vendorID       = 0x18d1,
+	.vendorDescr    = "Google, Inc.",
+};
+
+static struct platform_device rndis_device = {
+	.name   = "rndis",
+	.id     = -1,
+	.dev    = {
+		.platform_data = &rndis_pdata,
+	},
+};
+#endif
 
 static struct android_usb_platform_data android_usb_pdata = {
 	.vendor_id		= 0x0bb4,
@@ -298,7 +315,9 @@ static void mecha_add_usb_devices(void)
 	/* config_mecha_usb_id_gpios(0);*/
 	mecha_change_phy_voltage(0);
 	platform_device_register(&msm_device_hsusb);
-//	config_mecha_usb_uart_gpios();
+#ifdef CONFIG_USB_ANDROID_RNDIS
+	platform_device_register(&rndis_device);
+#endif
 	platform_device_register(&usb_mass_storage_device);
 	platform_device_register(&android_usb_device);
 }
@@ -569,9 +588,9 @@ static struct pm8058_led_platform_data pm8058_leds_data = {
 		   0, 0, 0, 0, 0, 0, 0, 0,
 		   0, 0, 0, 0, 0, 0, 0, 0,
 		   0, 0, 0, 0, 0, 0, 0, 0,
-			0, 0, 0, 0, 0, 0, 0, 0,
-			0, 0, 0, 0, 0, 0, 0, 0,
-			0, 0, 0, 0, 0, 0, 0, 0},
+		   0, 0, 0, 0, 0, 0, 0, 0,
+		   0, 0, 0, 0, 0, 0, 0, 0,
+		   0, 0, 0, 0, 0, 0, 0, 0},
 };
 
 static struct platform_device pm8058_leds = {
@@ -627,9 +646,9 @@ static struct pm8058_led_platform_data pm8058_leds_data_XC = {
 		   0, 0, 0, 0, 0, 0, 0, 0,
 		   0, 0, 0, 0, 0, 0, 0, 0,
 		   0, 0, 0, 0, 0, 0, 0, 0,
-			0, 0, 0, 0, 0, 0, 0, 0,
-			0, 0, 0, 0, 0, 0, 0, 0,
-			0, 0, 0, 0, 0, 0, 0, 0},
+		   0, 0, 0, 0, 0, 0, 0, 0,
+		   0, 0, 0, 0, 0, 0, 0, 0,
+		   0, 0, 0, 0, 0, 0, 0, 0},
 };
 
 static struct platform_device pm8058_leds_XC = {
@@ -2392,9 +2411,91 @@ static struct platform_device mecha_flashlight_device = {
 		.platform_data  = &mecha_flashlight_data,
 	},
 };
+#if defined(CONFIG_SERIAL_MSM_HS) && defined(CONFIG_SERIAL_MSM_HS_PURE_ANDROID)
+static struct msm_serial_hs_platform_data msm_uart_dm1_pdata = {
+	.rx_wakeup_irq = -1,
+	.inject_rx_on_wakeup = 0,
+	.exit_lpm_cb = bcm_bt_lpm_exit_lpm_locked,
+};
+
+static struct bcm_bt_lpm_platform_data bcm_bt_lpm_pdata = {
+	.gpio_wake = MECHA_GPIO_BT_CHIP_WAKE,
+	.gpio_host_wake = MECHA_GPIO_BT_HOST_WAKE,
+	.request_clock_off_locked = msm_hs_request_clock_off_locked,
+	.request_clock_on_locked = msm_hs_request_clock_on_locked,
+};
+
+struct platform_device bcm_bt_lpm_device = {
+	.name = "bcm_bt_lpm",
+	.id = 0,
+	.dev = {
+		.platform_data = &bcm_bt_lpm_pdata,
+	},
+};
+
+#define ATAG_BDADDR 0x43294329  /* mahimahi bluetooth address tag */
+#define ATAG_BDADDR_SIZE 4
+#define BDADDR_STR_SIZE 18
+
+static char bdaddr[BDADDR_STR_SIZE];
+extern unsigned char *get_bt_bd_ram(void);
+
+static void bt_export_bd_address(void)
+{
+        unsigned char cTemp[6];
+
+        memcpy(cTemp, get_bt_bd_ram(), 6);
+        sprintf(bdaddr, "%02x:%02x:%02x:%02x:%02x:%02x",
+                cTemp[0], cTemp[1], cTemp[2], cTemp[3], cTemp[4], cTemp[5]);
+        printk(KERN_INFO "BT HW address=%s\n", bdaddr);
+}
+
+module_param_string(bdaddr, bdaddr, sizeof(bdaddr), S_IWUSR | S_IRUGO);
+MODULE_PARM_DESC(bdaddr, "bluetooth address");
+
+#elif defined(CONFIG_SERIAL_MSM_HS)
+static struct msm_serial_hs_platform_data msm_uart_dm1_pdata = {
+	.rx_wakeup_irq = MSM_GPIO_TO_INT(MECHA_GPIO_BT_HOST_WAKE),
+	.inject_rx_on_wakeup = 0,
+	.cpu_lock_supported = 1,
+
+	/* for bcm */
+	.bt_wakeup_pin_supported = 1,
+	.bt_wakeup_pin = MECHA_GPIO_BT_CHIP_WAKE,
+	.host_wakeup_pin = MECHA_GPIO_BT_HOST_WAKE,
+};
+
+/* for bcm */
+static char bdaddress[20];
+extern unsigned char *get_bt_bd_ram(void);
+
+static void bt_export_bd_address(void)
+{
+	unsigned char cTemp[6];
+
+	memcpy(cTemp, get_bt_bd_ram(), 6);
+	sprintf(bdaddress, "%02x:%02x:%02x:%02x:%02x:%02x",
+		cTemp[0], cTemp[1], cTemp[2], cTemp[3], cTemp[4], cTemp[5]);
+	printk(KERN_INFO "YoYo--BD_ADDRESS=%s\n", bdaddress);
+}
+
+module_param_string(bdaddress, bdaddress, sizeof(bdaddress), S_IWUSR | S_IRUGO);
+MODULE_PARM_DESC(bdaddress, "BT MAC ADDRESS");
+
+static char bt_chip_id[10] = "bcm4329";
+module_param_string(bt_chip_id, bt_chip_id, sizeof(bt_chip_id), S_IWUSR | S_IRUGO);
+MODULE_PARM_DESC(bt_chip_id, "BT's chip id");
+
+static char bt_fw_version[10] = "v2.0.38";
+module_param_string(bt_fw_version, bt_fw_version, sizeof(bt_fw_version), S_IWUSR | S_IRUGO);
+MODULE_PARM_DESC(bt_fw_version, "BT's fw version");
+#endif
 
 static struct platform_device *devices[] __initdata = {
 	&msm_device_uart3,
+#ifdef CONFIG_SERIAL_MSM_HS_PURE_ANDROID
+	&bcm_bt_lpm_device,
+#endif
 	&msm_device_smd,
 	&mecha_rfkill,
 #ifdef CONFIG_I2C_SSBI
@@ -2458,45 +2559,6 @@ static struct platform_device *devices_Lightsensor[] __initdata = {
 	&lightsensor_pdev,
 #endif
 };
-
-#ifdef CONFIG_SERIAL_MSM_HS
-static struct msm_serial_hs_platform_data msm_uart_dm1_pdata = {
-	.rx_wakeup_irq = MSM_GPIO_TO_INT(MECHA_GPIO_BT_HOST_WAKE),
-	.inject_rx_on_wakeup = 0,
-	.cpu_lock_supported = 1,
-
-	/* for bcm */
-	.bt_wakeup_pin_supported = 1,
-	.bt_wakeup_pin = MECHA_GPIO_BT_CHIP_WAKE,
-	.host_wakeup_pin = MECHA_GPIO_BT_HOST_WAKE,
-
-};
-#endif
-
-/* for bcm */
-static char bdaddress[20];
-extern unsigned char *get_bt_bd_ram(void);
-
-static void bt_export_bd_address(void)
-{
-	unsigned char cTemp[6];
-
-	memcpy(cTemp, get_bt_bd_ram(), 6);
-	sprintf(bdaddress, "%02x:%02x:%02x:%02x:%02x:%02x",
-		cTemp[0], cTemp[1], cTemp[2], cTemp[3], cTemp[4], cTemp[5]);
-	printk(KERN_INFO "YoYo--BD_ADDRESS=%s\n", bdaddress);
-}
-
-module_param_string(bdaddress, bdaddress, sizeof(bdaddress), S_IWUSR | S_IRUGO);
-MODULE_PARM_DESC(bdaddress, "BT MAC ADDRESS");
-
-static char bt_chip_id[10] = "bcm4329";
-module_param_string(bt_chip_id, bt_chip_id, sizeof(bt_chip_id), S_IWUSR | S_IRUGO);
-MODULE_PARM_DESC(bt_chip_id, "BT's chip id");
-
-static char bt_fw_version[10] = "v2.0.38";
-module_param_string(bt_fw_version, bt_fw_version, sizeof(bt_fw_version), S_IWUSR | S_IRUGO);
-MODULE_PARM_DESC(bt_fw_version, "BT's fw version");
 
 static struct msm_i2c_device_platform_data msm_i2c_pdata = {
 	.i2c_clock = 100000,
@@ -2769,7 +2831,9 @@ static void __init mecha_init(void)
 
 #ifdef CONFIG_SERIAL_MSM_HS
 	msm_device_uart_dm1.dev.platform_data = &msm_uart_dm1_pdata;
+#ifndef CONFIG_SERIAL_MSM_HS_PURE_ANDROID
 	msm_device_uart_dm1.name = "msm_serial_hs_bcm";	/* for bcm */
+#endif
 	msm_add_serial_devices(3);
 #else
 	msm_add_serial_devices(0);
@@ -2891,6 +2955,19 @@ static void __init mecha_init(void)
 	mecha_wifi_init();
 	mecha_init_panel();
 }
+
+static int kernel_flag_boot_config(char *str)
+{
+	if (!str)
+		return -EINVAL;
+
+	kernel_flag = simple_strtoul(str, NULL, 16);
+
+	printk("Board-mecha: %s(): get kernel_flag=0x%x\n", __func__, kernel_flag);
+
+	return 0;
+}
+early_param("kernelflag", kernel_flag_boot_config);
 
 static void __init mecha_fixup(struct machine_desc *desc, struct tag *tags,
 				 char **cmdline, struct meminfo *mi)
