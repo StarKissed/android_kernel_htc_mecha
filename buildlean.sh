@@ -6,6 +6,7 @@ KERNELSPEC=leanKernel-tbolt-ics
 USERLOCAL=/Users/TwistedZero
 DROPBOX=/Users/TwistedZero/Dropbox/IceCreamSammy
 HANDLE=TwistedZero
+DEVICEREPO=github-aosp_source/android_device_htc_mecha
 
 CPU_JOB_NUM=16
 TOOLCHAIN_PREFIX=arm-none-eabi-
@@ -59,16 +60,22 @@ if [ ! -e ../../device/htc/mecha/kernel/lib/modules ]; then
 mkdir ../../device/htc/mecha/kernel/lib/modules
 fi
 
-cp -R drivers/net/wireless/bcm4329/bcm4329.ko ../../device/htc/mecha/kernel/lib/modules
-cp -R drivers/net/tun.ko ../../device/htc/mecha/kernel/lib/modules
-cp -R drivers/staging/zram/zram.ko ../../device/htc/mecha/kernel/lib/modules
-cp -R lib/lzo/lzo_decompress.ko ../../device/htc/mecha/kernel/lib/modules
-cp -R lib/lzo/lzo_compress.ko ../../device/htc/mecha/kernel/lib/modules
+cp -R drivers/net/wireless/bcm4329/bcm4329.ko ../../../$DEVICEREPO/kernel/lib/modules
+cp -R drivers/net/tun.ko ../../../$DEVICEREPO/kernel/lib/modules
+cp -R drivers/staging/zram/zram.ko ../../../$DEVICEREPO/kernel/lib/modules
+cp -R lib/lzo/lzo_decompress.ko ../../../$DEVICEREPO/kernel/lib/modules
+cp -R lib/lzo/lzo_compress.ko ../../../$DEVICEREPO/kernel/lib/modules
 if [ ! -e nsio*/*.ko ]; then
-cp -R nsio*/*.ko ../../device/htc/mecha/kernel/lib/modules
+cp -R nsio*/*.ko ../../../$DEVICEREPO/kernel/lib/modules
 fi
-cp -R fs/cifs/cifs.ko ../../device/htc/mecha/kernel/lib/modules
-cp -R arch/arm/boot/zImage ../../device/htc/mecha/kernel/kernel
+cp -R fs/cifs/cifs.ko ../../../$DEVICEREPO/kernel/lib/modules
+cp -R arch/arm/boot/zImage ../../../$DEVICEREPO/kernel/kernel
+
+if [ -e ../../../$DEVICEREPO/kernel/kernel ]; then
+cd ../../../$DEVICEREPO
+git commit -a -m "Automated Kernel Update"
+git push git@github.com:TwistedUmbrella/android_device_htc_mecha.git HEAD:ics
+fi
 
 else
 
@@ -109,6 +116,6 @@ rm *.zip
 zip -r $zipfile *
 rm /tmp/*.zip
 cp *.zip /tmp
-cp -R $BUILDDIR/kernel/$KERNELSPEC/$zipfile $DROPBOX/$zipfile
+cp -R $BUILDDIR/kernel/$KERNELSPEC/zip.aosp/$zipfile $DROPBOX/$zipfile
 
 fi
