@@ -1,3 +1,5 @@
+import init.mecha.usb.rc
+
 on early-fs
 
     mkdir /system
