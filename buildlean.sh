@@ -21,14 +21,14 @@ if [ $2 ]; then
 cp -R config/${2} .config
 fi
 
-sed -i s/CONFIG_LOCALVERSION=\"-imoseyon-.*\"/CONFIG_LOCALVERSION=\"-imoseyon-AOSP\"/ .config
+sed -i s/CONFIG_LOCALVERSION=\"-twistedzero-.*\"/CONFIG_LOCALVERSION=\"-twistedzero-AOSP\"/ .config
 
 if [ $1 -eq 2 ]; then
 sed -i "s/^.*UNLOCK_184.*$/CONFIG_UNLOCK_184MHZ=n/" .config
-zipfile="imoseyon_leanKernel_AOSP.zip"
+zipfile="twistedzero_leanKernel_AOSP.zip"
 else
 sed -i "s/^.*UNLOCK_184.*$/CONFIG_UNLOCK_184MHZ=y/" .config
-zipfile="imoseyon_leanKernel_184Mhz_AOSP.zip"
+zipfile="twistedzero_leanKernel_184Mhz_AOSP.zip"
 fi
 
 export USE_CCACHE=1
