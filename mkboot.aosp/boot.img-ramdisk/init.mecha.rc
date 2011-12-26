@@ -11,6 +11,8 @@ on early-fs
     mount ext4 /dev/block/mmcblk0p27 /cache noatime noauto_da_alloc,barrier=0,data=writeback 
     mount ext4 /dev/block/mmcblk0p29 /devlog noatime data=ordered,noauto_da_alloc,barrier=0
 
+import init.mecha.usb.rc
+
 #on early-init
     device mtd@misc 0460 radio diag
 
