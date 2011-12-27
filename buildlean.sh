@@ -1,11 +1,11 @@
 #!/bin/sh
 
+HANDLE=TwistedZero
 BUILDDIR=/Volumes/android/android-tzb_ics4.0.1
 CCACHEBIN=prebuilt/darwin-x86/ccache/ccache
 KERNELSPEC=leanKernel-tbolt-ics
-USERLOCAL=/Users/TwistedZero
-DROPBOX=/Users/TwistedZero/Dropbox/IceCreamSammy
-HANDLE=TwistedZero
+USERLOCAL=/Users/$HANDLE
+DROPBOX=/Users/$HANDLE/Dropbox/IceCreamSammy
 DEVICEREPO=github-aosp_source/android_device_htc_mecha
 GITHUB=TwistedUmbrella/android_device_htc_mecha.git
 
@@ -22,14 +22,14 @@ if [ $2 ]; then
 cp -R config/${2} .config
 fi
 
-sed -i s/CONFIG_LOCALVERSION=\"-twistedzero-.*\"/CONFIG_LOCALVERSION=\"-twistedzero-AOSP\"/ .config
+sed -i s/CONFIG_LOCALVERSION=\"-"$HANDLE"-.*\"/CONFIG_LOCALVERSION=\"-"$HANDLE"-AOSP\"/ .config
 
 if [ $1 -eq 2 ]; then
 sed -i "s/^.*UNLOCK_184.*$/CONFIG_UNLOCK_184MHZ=n/" .config
-zipfile="twistedzero_leanKernel_AOSP.zip"
+zipfile=$HANDLE"_leanKernel_AOSP.zip"
 else
 sed -i "s/^.*UNLOCK_184.*$/CONFIG_UNLOCK_184MHZ=y/" .config
-zipfile="twistedzero_leanKernel_184Mhz_AOSP.zip"
+zipfile=$HANDLE"_leanKernel_184Mhz_AOSP.zip"
 fi
 
 export USE_CCACHE=1
