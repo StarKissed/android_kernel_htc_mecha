@@ -7,6 +7,7 @@ USERLOCAL=/Users/TwistedZero
 DROPBOX=/Users/TwistedZero/Dropbox/IceCreamSammy
 HANDLE=TwistedZero
 DEVICEREPO=github-aosp_source/android_device_htc_mecha
+GITHUB=TwistedUmbrella/android_device_htc_mecha.git
 
 CPU_JOB_NUM=16
 TOOLCHAIN_PREFIX=arm-none-eabi-
@@ -50,14 +51,14 @@ if [ ! $3 ]; then
 
 echo "adding to build"
 
-if [ ! -e ../../device/htc/mecha/kernel ]; then
-mkdir ../../device/htc/mecha/kernel
+if [ ! -e ../../../$DEVICEREPO/kernel ]; then
+mkdir ../../../$DEVICEREPO/kernel
 fi
-if [ ! -e ../../device/htc/mecha/kernel/lib ]; then
-mkdir ../../device/htc/mecha/kernel/lib
+if [ ! -e ../../../$DEVICEREPO/kernel/lib ]; then
+mkdir ../../../$DEVICEREPO/kernel/lib
 fi
-if [ ! -e ../../device/htc/mecha/kernel/lib/modules ]; then
-mkdir ../../device/htc/mecha/kernel/lib/modules
+if [ ! -e ../../../$DEVICEREPO/kernel/lib/modules ]; then
+mkdir ../../../$DEVICEREPO/kernel/lib/modules
 fi
 
 cp -R drivers/net/wireless/bcm4329/bcm4329.ko ../../../$DEVICEREPO/kernel/lib/modules
@@ -74,7 +75,7 @@ cp -R arch/arm/boot/zImage ../../../$DEVICEREPO/kernel/kernel
 if [ -e ../../../$DEVICEREPO/kernel/kernel ]; then
 cd ../../../$DEVICEREPO
 git commit -a -m "Automated Kernel Update"
-git push git@github.com:TwistedUmbrella/android_device_htc_mecha.git HEAD:ics
+git push git@github.com:$GITHUB HEAD:ics
 fi
 
 else
