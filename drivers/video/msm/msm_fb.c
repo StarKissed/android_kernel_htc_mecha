@@ -1128,7 +1128,7 @@ static struct file_operations debug_fops = {
 };
 #endif
 
-#define BITS_PER_PIXEL_DEF 16
+#define BITS_PER_PIXEL_DEF 32
 
 static void setup_fb_info(struct msmfb_info *msmfb)
 {
