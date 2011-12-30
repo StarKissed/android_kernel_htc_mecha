@@ -6,7 +6,7 @@
 
 HANDLE=TwistedZero
 BUILDDIR=/Volumes/android/android-tzb_ics4.0.1
-CCACHEBIN=prebuilt/darwin-x86/ccache/ccache
+CCACHEBIN=../../prebuilt/darwin-x86/ccache/ccache
 KERNELSPEC=leanKernel-tbolt-ics
 USERLOCAL=/Users/$HANDLE
 DROPBOX=/Users/$HANDLE/Dropbox/IceCreamSammy
@@ -18,7 +18,7 @@ TOOLCHAIN_PREFIX=arm-none-eabi-
 
 export USE_CCACHE=1
 export CCACHE_DIR=$USERLOCAL/.ccache/kernel
-../../$CCACHEBIN -M 40G
+$CCACHEBIN -M 40G
 make clean -j$CPU_JOB_NUM
 rm -R $CCACHE_DIR/*
 
@@ -38,7 +38,7 @@ fi
 
 export USE_CCACHE=1
 export CCACHE_DIR=$USERLOCAL/.ccache/kernel
-../../$CCACHEBIN -M 40G
+$CCACHEBIN -M 40G
 make -j$CPU_JOB_NUM ARCH=arm CROSS_COMPILE=$TOOLCHAIN_PREFIX
 rm -R $CCACHE_DIR/*
 
