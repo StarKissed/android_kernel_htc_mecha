@@ -6,21 +6,17 @@
 
 HANDLE=TwistedZero
 BUILDDIR=/Volumes/android/android-tzb_ics4.0.1
-CCACHEBIN=../../prebuilt/darwin-x86/ccache/ccache
 KERNELSPEC=leanKernel-tbolt-ics
-USERLOCAL=/Users/$HANDLE
 DROPBOX=/Users/$HANDLE/Dropbox/IceCreamSammy
-DEVICEREPO=github-aosp_source/android_device_htc_mecha
-GITHUB=TwistedUmbrella/android_device_htc_mecha.git
+MECHAREPO=github-aosp_source/android_device_htc_mecha
+MECHAGITHUB=TwistedUmbrella/android_device_htc_mecha.git
+ACEREPO=github-aosp_source/android_device_htc_ace
+ACEGITHUB=TwistedUmbrella/android_device_htc_ace.git
 
 CPU_JOB_NUM=16
 TOOLCHAIN_PREFIX=arm-none-eabi-
 
-export USE_CCACHE=1
-export CCACHE_DIR=$USERLOCAL/.ccache/kernel
-$CCACHEBIN -M 40G
 make clean -j$CPU_JOB_NUM
-rm -R $CCACHE_DIR/*
 
 if [ $2 ]; then
 cp -R config/${2} .config
@@ -36,11 +32,7 @@ sed -i "s/^.*UNLOCK_184.*$/CONFIG_UNLOCK_184MHZ=y/" .config
 zipfile=$HANDLE"_leanKernel_184Mhz_AOSP.zip"
 fi
 
-export USE_CCACHE=1
-export CCACHE_DIR=$USERLOCAL/.ccache/kernel
-$CCACHEBIN -M 40G
 make -j$CPU_JOB_NUM ARCH=arm CROSS_COMPILE=$TOOLCHAIN_PREFIX
-rm -R $CCACHE_DIR/*
 
 # make nsio module here for now
 cd nsio*
@@ -51,35 +43,66 @@ find . -name "*.ko" | xargs ${TOOLCHAIN_PREFIX}strip --strip-unneeded
 
 cp .config arch/arm/configs/lean_aosp_defconfig
 
-if [ ! $3 ]; then
+if [ "$3" == "mecha" ]; then
 
 echo "adding to build"
 
-if [ ! -e ../../../$DEVICEREPO/kernel ]; then
-mkdir ../../../$DEVICEREPO/kernel
+if [ ! -e ../../../$MECHAREPO/kernel ]; then
+mkdir ../../../$MECHAREPO/kernel
 fi
-if [ ! -e ../../../$DEVICEREPO/kernel/lib ]; then
-mkdir ../../../$DEVICEREPO/kernel/lib
+if [ ! -e ../../../$MECHAREPO/kernel/lib ]; then
+mkdir ../../../$MECHAREPO/kernel/lib
 fi
-if [ ! -e ../../../$DEVICEREPO/kernel/lib/modules ]; then
-mkdir ../../../$DEVICEREPO/kernel/lib/modules
+if [ ! -e ../../../$MECHAREPO/kernel/lib/modules ]; then
+mkdir ../../../$MECHAREPO/kernel/lib/modules
 fi
 
-cp -R drivers/net/wireless/bcm4329/bcm4329.ko ../../../$DEVICEREPO/kernel/lib/modules
-cp -R drivers/net/tun.ko ../../../$DEVICEREPO/kernel/lib/modules
-cp -R drivers/staging/zram/zram.ko ../../../$DEVICEREPO/kernel/lib/modules
-cp -R lib/lzo/lzo_decompress.ko ../../../$DEVICEREPO/kernel/lib/modules
-cp -R lib/lzo/lzo_compress.ko ../../../$DEVICEREPO/kernel/lib/modules
+cp -R drivers/net/wireless/bcm4329/bcm4329.ko ../../../$MECHAREPO/kernel/lib/modules
+cp -R drivers/net/tun.ko ../../../$MECHAREPO/kernel/lib/modules
+cp -R drivers/staging/zram/zram.ko ../../../$MECHAREPO/kernel/lib/modules
+cp -R lib/lzo/lzo_decompress.ko ../../../$MECHAREPO/kernel/lib/modules
+cp -R lib/lzo/lzo_compress.ko ../../../$MECHAREPO/kernel/lib/modules
 if [ ! -e nsio*/*.ko ]; then
-cp -R nsio*/*.ko ../../../$DEVICEREPO/kernel/lib/modules
+cp -R nsio*/*.ko ../../../$MECHAREPO/kernel/lib/modules
 fi
-cp -R fs/cifs/cifs.ko ../../../$DEVICEREPO/kernel/lib/modules
-cp -R arch/arm/boot/zImage ../../../$DEVICEREPO/kernel/kernel
+cp -R fs/cifs/cifs.ko ../../../$MECHAREPO/kernel/lib/modules
+cp -R arch/arm/boot/zImage ../../../$MECHAREPO/kernel/kernel
 
-if [ -e ../../../$DEVICEREPO/kernel/kernel ]; then
-cd ../../../$DEVICEREPO
+if [ -e ../../../$MECHAREPO/kernel/kernel ]; then
+cd ../../../$MECHAREPO
 git commit -a -m "Automated Kernel Update"
-git push git@github.com:$GITHUB HEAD:ics
+git push git@github.com:$MECHAGITHUB HEAD:ics
+fi
+
+elif [ "$3" == "ace" ]; then
+
+echo "adding to build"
+
+if [ ! -e ../../../$ACEREPO/kernel ]; then
+mkdir ../../../$ACEREPO/kernel
+fi
+if [ ! -e ../../../$ACEREPO/kernel/lib ]; then
+mkdir ../../../$ACEREPO/kernel/lib
+fi
+if [ ! -e ../../../$ACEREPO/kernel/lib/modules ]; then
+mkdir ../../../$ACEREPO/kernel/lib/modules
+fi
+
+cp -R drivers/net/wireless/bcm4329/bcm4329.ko ../../../$ACEREPO/kernel/lib/modules
+cp -R drivers/net/tun.ko ../../../$ACEREPO/kernel/lib/modules
+cp -R drivers/staging/zram/zram.ko ../../../$ACEREPO/kernel/lib/modules
+cp -R lib/lzo/lzo_decompress.ko ../../../$ACEREPO/kernel/lib/modules
+cp -R lib/lzo/lzo_compress.ko ../../../$MECHAREPO/kernel/lib/modules
+if [ ! -e nsio*/*.ko ]; then
+cp -R nsio*/*.ko ../../../$ACEREPO/kernel/lib/modules
+fi
+cp -R fs/cifs/cifs.ko ../../../$ACEREPO/kernel/lib/modules
+cp -R arch/arm/boot/zImage ../../../$ACEREPO/kernel/kernel
+
+if [ -e ../../../$ACEREPO/kernel/kernel ]; then
+cd ../../../$ACEREPO
+git commit -a -m "Automated Kernel Update"
+git push git@github.com:$ACEGITHUB HEAD:ics
 fi
 
 else

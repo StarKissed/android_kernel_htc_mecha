@@ -1,5 +1,3 @@
-import init.mecha.usb.rc
-
 on early-fs
 
     mkdir /system
@@ -89,6 +87,13 @@ on boot
     # 9k modem
     chown system system /sys/module/msm72k_udc/parameters/mdm_port_enabled
     chown system system /sys/module/smsc251x/parameters/hub_enabled
+
+    # Permissions for Camera
+    chmod 0666 /dev/msm_camera/config0
+    chmod 0666 /dev/msm_camera/control0
+    chmod 0666 /dev/msm_camera/frame0
+
+    chmod 0666 /dev/graphics/fb0
 
 service ril-ims-daemon /system/bin/rild_ims
     class main
