@@ -12,6 +12,7 @@ MECHAREPO=github-aosp_source/android_device_htc_mecha
 MECHAGITHUB=TwistedUmbrella/android_device_htc_mecha.git
 ACEREPO=github-aosp_source/android_device_htc_ace
 ACEGITHUB=TwistedUmbrella/android_device_htc_ace.git
+MSMREPO=github-aosp_source/android_device_htc_msm7x30-common
 
 CPU_JOB_NUM=16
 TOOLCHAIN_PREFIX=arm-none-eabi-
@@ -20,6 +21,12 @@ echo "Config Name? ";
 ls config
 read configfile
 cp -R config/$configfile .config
+
+cp -R ../../../$ACEREPO/kernel/init.spade.rc $BUILDDIR/kernel/$KERNELSPEC/mkboot.aosp/boot.img-ramdisk
+cp -R ../../../$ACEREPO/kernel/ueventd.spade.rc $BUILDDIR/kernel/$KERNELSPEC/mkboot.aosp/boot.img-ramdisk
+cp -R ../../../$MECHAREPO/kernel/init.mecha.rc $BUILDDIR/kernel/$KERNELSPEC/mkboot.aosp/boot.img-ramdisk
+cp -R ../../../$MECHAREPO/kernel/ueventd.mecha.rc $BUILDDIR/kernel/$KERNELSPEC/mkboot.aosp/boot.img-ramdisk
+cp -R ../../../$MSMREPO/kernel/init.msm7x30.usb.rc $BUILDDIR/kernel/$KERNELSPEC/mkboot.aosp/boot.img-ramdisk
 
 make clean -j$CPU_JOB_NUM
 
