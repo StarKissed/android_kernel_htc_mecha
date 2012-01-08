@@ -1,7 +1,7 @@
 #!/bin/sh
 
 # This script is designed to compliment .bash_profile code to automate the build process by adding a typical shell command such as:
-# function buildKernel { cd /Volumes/android/android-tzb_ics4.0.1/kernel/leanKernel-tbolt-ics; echo "Config Name? "; ls config; read config; ./buildlean.sh 1 $config 1; }
+# function function buildKernel { cd /Volumes/android/android-tzb_ics4.0.1/kernel/leanKernel-tbolt-ics; echo "Ace, Mecha, Release?"; read device; ./buildlean.sh 1 $device; }
 # This script is designed by Twisted Playground for use on MacOSX 10.7 but can be modified for other distributions of Mac and Linux
 
 HANDLE=TwistedZero
@@ -16,11 +16,12 @@ ACEGITHUB=TwistedUmbrella/android_device_htc_ace.git
 CPU_JOB_NUM=16
 TOOLCHAIN_PREFIX=arm-none-eabi-
 
-make clean -j$CPU_JOB_NUM
+echo "Config Name? ";
+ls config
+read configfile
+cp -R config/$configfile .config
 
-if [ $2 ]; then
-cp -R config/${2} .config
-fi
+make clean -j$CPU_JOB_NUM
 
 sed -i s/CONFIG_LOCALVERSION=\"-"$HANDLE"-.*\"/CONFIG_LOCALVERSION=\"-"$HANDLE"-AOSP\"/ .config
 
@@ -43,7 +44,7 @@ find . -name "*.ko" | xargs ${TOOLCHAIN_PREFIX}strip --strip-unneeded
 
 cp .config arch/arm/configs/lean_aosp_defconfig
 
-if [ "$3" == "mecha" ]; then
+if [ "$2" == "mecha" ]; then
 
 echo "adding to build"
 
@@ -74,7 +75,7 @@ git commit -a -m "Automated Kernel Update"
 git push git@github.com:$MECHAGITHUB HEAD:ics
 fi
 
-elif [ "$3" == "ace" ]; then
+elif [ "$2" == "ace" ]; then
 
 echo "adding to build"
 

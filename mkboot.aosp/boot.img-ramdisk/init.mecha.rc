@@ -9,7 +9,7 @@ on early-fs
     mount ext4 /dev/block/mmcblk0p27 /cache noatime noauto_da_alloc,barrier=0,data=writeback 
     mount ext4 /dev/block/mmcblk0p29 /devlog noatime data=ordered,noauto_da_alloc,barrier=0
 
-import init.mecha.usb.rc
+import init.msm7x30.usb.rc
 
 #on early-init
     device mtd@misc 0460 radio diag
@@ -92,7 +92,9 @@ on boot
     chmod 0666 /dev/msm_camera/config0
     chmod 0666 /dev/msm_camera/control0
     chmod 0666 /dev/msm_camera/frame0
-
+    chmod 0666 /dev/msm_camera/config1
+    chmod 0666 /dev/msm_camera/control1
+    chmod 0666 /dev/msm_camera/frame1
     chmod 0666 /dev/graphics/fb0
 
 service ril-ims-daemon /system/bin/rild_ims
