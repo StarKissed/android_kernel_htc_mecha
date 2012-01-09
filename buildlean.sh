@@ -1,10 +1,12 @@
 #!/bin/sh
 
+# Copyright (C) 2011 Twisted Playground
+
 # This script is designed to compliment .bash_profile code to automate the build process by adding a typical shell command such as:
 # function function buildKernel { cd /Volumes/android/android-tzb_ics4.0.1/kernel/leanKernel-tbolt-ics; echo "Ace, Mecha, Release?"; read device; ./buildlean.sh 1 $device; }
 # This script is designed by Twisted Playground for use on MacOSX 10.7 but can be modified for other distributions of Mac and Linux
 
-PROPER=$1 | sed 's/\([a-z]\)\([a-zA-Z0-9]*\)/\u\1\2/g'
+PROPER=`echo $1 | sed 's/\([a-z]\)\([a-zA-Z0-9]*\)/\u\1\2/g'`
 
 HANDLE=TwistedZero
 BUILDDIR=/Volumes/android/android-tzb_ics4.0.1
