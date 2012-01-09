@@ -1,4 +1,4 @@
-/* Copyright (c) 2010, Code Aurora Forum. All rights reserved.
+/* Copyright (c) 2010-2012, Code Aurora Forum. All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are
@@ -48,6 +48,11 @@ struct res_trk_context {
 	unsigned int rail_enabled;
 	unsigned int perf_level;
 	u32 core_type;
+	struct ddl_buf_addr firmware_addr;
+	struct ion_client *res_ion_client;
+	u32 disable_dmx;
+	u32 disable_fullhd;
+	enum ddl_mem_area res_mem_type;
 };
 
 #if DEBUG

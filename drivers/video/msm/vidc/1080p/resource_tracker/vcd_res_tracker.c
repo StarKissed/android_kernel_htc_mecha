@@ -1,4 +1,4 @@
-/* Copyright (c) 2010, Code Aurora Forum. All rights reserved.
+/* Copyright (c) 2010-2012, Code Aurora Forum. All rights reserved.
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License version 2 and
@@ -411,10 +411,98 @@ void res_trk_init(struct device *device, u32 irq)
 		mutex_init(&resource_context.lock);
 		resource_context.device = device;
 		resource_context.irq_num = irq;
+		resource_context.vidc_platform_data =
+			(struct msm_vidc_platform_data *) device->platform_data;
+		if (resource_context.vidc_platform_data) {
+			resource_context.memtype =
+			resource_context.vidc_platform_data->memtype;
+			resource_context.fw_mem_type =
+			resource_context.vidc_platform_data->memtype;
+			resource_context.cmd_mem_type =
+			resource_context.vidc_platform_data->memtype;
+			if (resource_context.vidc_platform_data->enable_ion) {
+				resource_context.res_ion_client =
+					res_trk_create_ion_client();
+				if (!(resource_context.res_ion_client)) {
+					VCDRES_MSG_ERROR("%s()ION createfail\n",
+							__func__);
+					return;
+				}
+				resource_context.fw_mem_type =
+				resource_context.vidc_platform_data->memtype;
+				resource_context.cmd_mem_type =
+				ION_CP_MFC_HEAP_ID;
+			}
+			resource_context.disable_dmx =
+			resource_context.vidc_platform_data->disable_dmx;
+			resource_context.disable_fullhd =
+			resource_context.vidc_platform_data->disable_fullhd;
+#ifdef CONFIG_MSM_BUS_SCALING
+			resource_context.vidc_bus_client_pdata =
+			resource_context.vidc_platform_data->
+				vidc_bus_client_pdata;
+#endif
+		} else {
+			resource_context.memtype = -1;
+			resource_context.disable_dmx = 0;
+		}
 		resource_context.core_type = VCD_CORE_1080P;
 	}
 }
 
 u32 res_trk_get_core_type(void){
 	return resource_context.core_type;
+}
+
+u32 res_trk_get_firmware_addr(struct ddl_buf_addr *firm_addr)
+{
+	int status = -1;
+	if (resource_context.firmware_addr.mapped_buffer) {
+		memcpy(firm_addr, &resource_context.firmware_addr,
+			   sizeof(struct ddl_buf_addr));
+		status = 0;
+	}
+	return status;
+}
+
+u32 res_trk_get_mem_type(void)
+{
+	switch (resource_context.res_mem_type) {
+	case DDL_FW_MEM:
+		return resource_context.fw_mem_type;
+	case DDL_MM_MEM:
+		return resource_context.memtype;
+	case DDL_CMD_MEM:
+		return resource_context.cmd_mem_type;
+	default:
+		return 0;
+	}
+}
+
+u32 res_trk_get_enable_ion(void)
+{
+	if (resource_context.vidc_platform_data->enable_ion)
+		return 1;
+	else
+		return 0;
+}
+
+struct ion_client *res_trk_get_ion_client(void)
+{
+	return resource_context.res_ion_client;
+}
+
+u32 res_trk_get_disable_dmx(void){
+	return resource_context.disable_dmx;
+}
+
+void res_trk_set_mem_type(enum ddl_mem_area mem_type)
+{
+	resource_context.res_mem_type = mem_type;
+	return;
+}
+
+u32 res_trk_get_disable_fullhd(void)
+{
+	return resource_context.disable_fullhd;
 }
