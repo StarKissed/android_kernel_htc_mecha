@@ -4,6 +4,8 @@
 # function function buildKernel { cd /Volumes/android/android-tzb_ics4.0.1/kernel/leanKernel-tbolt-ics; echo "Ace, Mecha, Release?"; read device; ./buildlean.sh 1 $device; }
 # This script is designed by Twisted Playground for use on MacOSX 10.7 but can be modified for other distributions of Mac and Linux
 
+PROPER=$1 | sed 's/\([a-z]\)\([a-zA-Z0-9]*\)/\u\1\2/g'
+
 HANDLE=TwistedZero
 BUILDDIR=/Volumes/android/android-tzb_ics4.0.1
 KERNELSPEC=leanKernel-tbolt-ics
@@ -78,7 +80,7 @@ cp -R arch/arm/boot/zImage ../../../$MECHAREPO/kernel/kernel
 
 if [ -e ../../../$MECHAREPO/kernel/kernel ]; then
 cd ../../../$MECHAREPO
-git commit -a -m "Automated Kernel Update"
+git commit -a -m "Automated Kernel Update - ${PROPER}"
 git push git@github.com:$MECHAGITHUB HEAD:ics
 fi
 
@@ -109,7 +111,7 @@ cp -R arch/arm/boot/zImage ../../../$ACEREPO/kernel/kernel
 
 if [ -e ../../../$ACEREPO/kernel/kernel ]; then
 cd ../../../$ACEREPO
-git commit -a -m "Automated Kernel Update"
+git commit -a -m "Automated Kernel Update - ${PROPER}"
 git push git@github.com:$ACEGITHUB HEAD:ics
 fi
 
