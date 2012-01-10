@@ -16,24 +16,19 @@
  *
  */
 
-#include <linux/delay.h>
-#include <linux/relay.h>
-#include <linux/debugfs.h>
 #include <linux/vmalloc.h>
-#include <linux/debugfs.h>
 
 #include "kgsl.h"
-#include "kgsl_device.h"
-#include "kgsl_cmdstream.h"
-#include "kgsl_log.h"
-#include "kgsl_postmortem.h"
-#include "kgsl_pm4types.h"
-#include "yamato_reg.h"
-#include "kgsl_yamato.h"
+
+#include "adreno.h"
+#include "adreno_pm4types.h"
+#include "adreno_ringbuffer.h"
+#include "adreno_postmortem.h"
+#include "adreno_debugfs.h"
+
+#include "a200_reg.h"
 
 #define INVALID_RB_CMD 0xaaaaaaaa
-
-static int kgsl_pm_regs_enabled;
 
 struct pm_id_name {
 	uint32_t id;
@@ -676,8 +671,8 @@ static int kgsl_dump_yamato(struct kgsl_device *device)
 	KGSL_LOG_DUMP(device,
 		"MH_INTERRUPT: MASK = %08X | STATUS   = %08X\n", r1, r2);
 
-	if (device->ftbl.device_cmdstream_readtimestamp != NULL) {
-		ts_processed = device->ftbl.device_cmdstream_readtimestamp(
+	if (device->ftbl.device_readtimestamp != NULL) {
+		ts_processed = device->ftbl.device_readtimestamp(
 				device, KGSL_TIMESTAMP_RETIRED);
 		KGSL_LOG_DUMP(device, "TIMESTM RTRD: %08X\n", ts_processed);
 	}
@@ -780,7 +775,7 @@ static int kgsl_dump_yamato(struct kgsl_device *device)
 
 	/* Dump the registers if the user asked for it */
 
-	for (i = 0; kgsl_pm_regs_enabled && kgsl_registers[i].id; i++) {
+	for (i = 0; kgsl_pmregs_enabled() && kgsl_registers[i].id; i++) {
 		if (kgsl_registers[i].id == device->chip_id) {
 			kgsl_dump_regs(device, kgsl_registers[i].registers,
 				       kgsl_registers[i].len);
@@ -808,127 +803,67 @@ int kgsl_postmortem_dump(struct kgsl_device *device, int manual)
 
 	BUG_ON(device == NULL);
 
-	if (device->id == KGSL_DEVICE_YAMATO) {
+	/* For a manual dump, make sure that the system is idle */
 
-		/* For a manual dump, make sure that the system is idle */
-
-		if (manual) {
-			if (device->active_cnt != 0) {
-				mutex_unlock(&device->mutex);
-				wait_for_completion(&device->suspend_gate);
-				mutex_lock(&device->mutex);
-			}
-
-			if (device->state == KGSL_STATE_ACTIVE)
-				kgsl_idle(device,  KGSL_TIMEOUT_DEFAULT);
-
+	if (manual) {
+		if (device->active_cnt != 0) {
+			mutex_unlock(&device->mutex);
+			wait_for_completion(&device->suspend_gate);
+			mutex_lock(&device->mutex);
 		}
-		/* Disable the idle timer so we don't get interrupted */
-		del_timer(&device->idle_timer);
 
-		/* Turn off napping to make sure we have the clocks full
-		   attention through the following process */
-		saved_nap = device->pwrctrl.nap_allowed;
-		device->pwrctrl.nap_allowed = false;
+		if (device->state == KGSL_STATE_ACTIVE)
+			kgsl_idle(device,  KGSL_TIMEOUT_DEFAULT);
 
-		/* Force on the clocks */
-		kgsl_pwrctrl_wake(device);
+	}
+	/* Disable the idle timer so we don't get interrupted */
+	del_timer(&device->idle_timer);
 
-		/* Disable the irq */
-		kgsl_pwrctrl_irq(device, KGSL_PWRFLAGS_IRQ_OFF);
+	/* Turn off napping to make sure we have the clocks full
+	   attention through the following process */
+	saved_nap = device->pwrctrl.nap_allowed;
+	device->pwrctrl.nap_allowed = false;
 
-		/* If this is not a manual trigger, then set up the
-		   state to try to recover */
+	/* Force on the clocks */
+	kgsl_pwrctrl_wake(device);
 
-		if (!manual) {
-			device->state = KGSL_STATE_DUMP_AND_RECOVER;
-			KGSL_PWR_WARN(device,
+	/* Disable the irq */
+	kgsl_pwrctrl_irq(device, KGSL_PWRFLAGS_IRQ_OFF);
+
+	/* If this is not a manual trigger, then set up the
+	   state to try to recover */
+
+	if (!manual) {
+		device->state = KGSL_STATE_DUMP_AND_RECOVER;
+		KGSL_PWR_WARN(device,
 				"state -> DUMP_AND_RECOVER, device %d\n",
 				device->id);
-		}
-
-		KGSL_DRV_ERR(device,
-			"wait for work in workqueue to complete\n");
-		mutex_unlock(&device->mutex);
-		flush_workqueue(device->work_queue);
-		mutex_lock(&device->mutex);
-		kgsl_dump_yamato(device);
-
-		/* Restore nap mode */
-		device->pwrctrl.nap_allowed = saved_nap;
-
-		/* On a manual trigger, turn on the interrupts and put
-		   the clocks to sleep.  They will recover themselves
-		   on the next event.  For a hang, leave things as they
-		   are until recovery kicks in. */
-
-		if (manual) {
-			kgsl_pwrctrl_irq(device, KGSL_PWRFLAGS_IRQ_ON);
-
-			/* try to go into a sleep mode until the next event */
-			device->requested_state = KGSL_STATE_SLEEP;
-			kgsl_pwrctrl_sleep(device);
-		}
 	}
-	else
-		KGSL_DRV_CRIT(device, "Unknown device id - 0x%x\n", device->id);
+
+	KGSL_DRV_ERR(device,
+			"wait for work in workqueue to complete\n");
+	mutex_unlock(&device->mutex);
+	flush_workqueue(device->work_queue);
+	mutex_lock(&device->mutex);
+	kgsl_dump_yamato(device);
+
+	/* Restore nap mode */
+	device->pwrctrl.nap_allowed = saved_nap;
+
+	/* On a manual trigger, turn on the interrupts and put
+	   the clocks to sleep.  They will recover themselves
+	   on the next event.  For a hang, leave things as they
+	   are until recovery kicks in. */
+
+	if (manual) {
+		kgsl_pwrctrl_irq(device, KGSL_PWRFLAGS_IRQ_ON);
+
+		/* try to go into a sleep mode until the next event */
+		device->requested_state = KGSL_STATE_SLEEP;
+		kgsl_pwrctrl_sleep(device);
+	}
 
 	KGSL_DRV_ERR(device, "Dump Finished\n");
 
-	KGSL_DRV_ERR(device, "Should not happen, reboot by kgsl\n");
-	hr_msleep(5000);
-	BUG_ON(true);
-
 	return 0;
-}
-
-static struct dentry *pm_d_debugfs;
-
-static int pm_dump_set(void *data, u64 val)
-{
-	struct kgsl_device *device = data;
-
-	if (val) {
-		mutex_lock(&device->mutex);
-		kgsl_postmortem_dump(device, 1);
-		mutex_unlock(&device->mutex);
-	}
-
-	return 0;
-}
-
-DEFINE_SIMPLE_ATTRIBUTE(pm_dump_fops,
-			NULL,
-			pm_dump_set, "%llu\n");
-
-static int pm_regs_enabled_set(void *data, u64 val)
-{
-	kgsl_pm_regs_enabled = val ? 1 : 0;
-	return 0;
-}
-
-static int pm_regs_enabled_get(void *data, u64 *val)
-{
-	*val = kgsl_pm_regs_enabled;
-	return 0;
-}
-
-DEFINE_SIMPLE_ATTRIBUTE(pm_regs_enabled_fops,
-			pm_regs_enabled_get,
-			pm_regs_enabled_set, "%llu\n");
-
-void kgsl_postmortem_init(struct kgsl_device *device)
-{
-	if (!device->d_debugfs || IS_ERR(device->d_debugfs))
-		return;
-
-	pm_d_debugfs = debugfs_create_dir("postmortem", device->d_debugfs);
-
-	if (IS_ERR(pm_d_debugfs))
-		return;
-
-	debugfs_create_file("dump",  0600, pm_d_debugfs, device,
-			    &pm_dump_fops);
-	debugfs_create_file("regs_enabled", 0644, pm_d_debugfs, device,
-			    &pm_regs_enabled_fops);
 }
