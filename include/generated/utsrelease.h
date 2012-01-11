@@ -1,1 +1,1 @@
-#define UTS_RELEASE "2.6.35.14-imoseyon-AOSP+"
+#define UTS_RELEASE "2.6.35.14-TwistedZero-AOSP+"
