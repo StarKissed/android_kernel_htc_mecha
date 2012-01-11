@@ -1089,7 +1089,7 @@ static int do_write(struct fsg_common *common)
 write_error:
 			if ((nwritten == amount) && !csw_hack_sent) {
 				if (write_error_after_csw_sent)
-					break;
+                                         break;
 				/*
 				 * Check if any of the buffer is in the
 				 * busy state, if any buffer is in busy state,
@@ -1917,7 +1917,6 @@ static int send_status(struct fsg_common *common)
 
 	csw->Signature = cpu_to_le32(USB_BULK_CS_SIG);
 	csw->Tag = common->tag;
-	csw->Residue = cpu_to_le32(common->residue);
 #ifdef CONFIG_USB_CSW_HACK
 	/* Since csw is being sent early, before
 	 * writing on to storage media, need to set
