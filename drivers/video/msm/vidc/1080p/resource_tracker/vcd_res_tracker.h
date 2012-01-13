@@ -53,6 +53,7 @@ struct res_trk_context {
 	u32 disable_dmx;
 	u32 disable_fullhd;
 	enum ddl_mem_area res_mem_type;
+	u32 mmu_clks_on;
 };
 
 #if DEBUG
