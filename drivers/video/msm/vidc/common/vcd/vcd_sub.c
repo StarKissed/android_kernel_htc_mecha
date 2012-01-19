@@ -29,7 +29,52 @@ static int vcd_pmem_alloc(size_t sz, u8 **kernel_vaddr, u8 **phy_addr)
 	*phy_addr =
 	    (u8 *) pmem_kalloc(sz, PMEM_MEMTYPE | PMEM_ALIGNMENT_4K);
 
-	if (!IS_ERR((void *)*phy_addr)) {
+	if (!kernel_vaddr || !phy_addr || !cctxt) {
+		pr_err("\n%s: Invalid parameters", __func__);
+		goto bailout;
+	}
+	*phy_addr = NULL;
+	*kernel_vaddr = NULL;
+	for (i = 0; i  < MAP_TABLE_SZ; i++) {
+		if (!msm_mapped_buffer_table[i].in_use) {
+			map_buffer = &msm_mapped_buffer_table[i];
+			map_buffer->in_use = 1;
+			break;
+		}
+	}
+	if (!map_buffer) {
+		pr_err("%s() map table is full", __func__);
+		goto bailout;
+	}
+	res_trk_set_mem_type(DDL_MM_MEM);
+	memtype = res_trk_get_mem_type();
+	if (!cctxt->vcd_enable_ion) {
+		map_buffer->phy_addr = (phys_addr_t)
+		allocate_contiguous_memory_nomap(sz, memtype, SZ_4K);
+		if (!map_buffer->phy_addr) {
+			pr_err("%s() acm alloc failed", __func__);
+			goto free_map_table;
+		}
+	} else {
+		map_buffer->alloc_handle = ion_alloc(
+			    cctxt->vcd_ion_client, sz, SZ_4K,
+			    memtype);
+		if (!map_buffer->alloc_handle) {
+			pr_err("%s() ION alloc failed", __func__);
+			goto bailout;
+		}
+		rc = ion_phys(cctxt->vcd_ion_client,
+		map_buffer->alloc_handle, &phyaddr, &len);
+		if (rc) {
+			pr_err("%s() : ION client physical fail\n",
+			 __func__);
+			goto free_acm_alloc;
+		}
+		map_buffer->phy_addr = phyaddr;
+		if (!map_buffer->phy_addr) {
+			pr_err("%s() acm alloc failed", __func__);
+			goto free_map_table;
+		}
 
 		*kernel_vaddr = ioremap((unsigned long)*phy_addr, sz);
 

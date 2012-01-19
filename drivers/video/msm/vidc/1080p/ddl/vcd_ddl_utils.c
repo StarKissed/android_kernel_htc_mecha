@@ -1,4 +1,4 @@
-/* Copyright (c) 2010-2011, Code Aurora Forum. All rights reserved.
+/* Copyright (c) 2010-2012, Code Aurora Forum. All rights reserved.
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License version 2 and
@@ -42,12 +42,41 @@ void *ddl_pmem_alloc(struct ddl_buf_addr *addr, size_t sz, u32 alignment)
 	u32 alloc_size, offset = 0;
 	DBG_PMEM("\n%s() IN: Requested alloc size(%u)", __func__, (u32)sz);
 	alloc_size = (sz + alignment);
-	addr->physical_base_addr = (u8 *) pmem_kalloc(alloc_size,
-		PMEM_MEMTYPE_SMI | PMEM_ALIGNMENT_4K);
-	if (!addr->physical_base_addr) {
-		DDL_MSG_ERROR("%s() : pmem alloc failed (%d)\n", __func__,
-			alloc_size);
-		return NULL;
+	if (res_trk_get_enable_ion()) {
+		if (!ddl_context->video_ion_client)
+			ddl_context->video_ion_client =
+				res_trk_get_ion_client();
+		if (!ddl_context->video_ion_client) {
+			DDL_MSG_ERROR("%s() :DDL ION Client Invalid handle\n",
+						 __func__);
+			goto bail_out;
+		}
+		addr->alloc_handle = ion_alloc(
+		ddl_context->video_ion_client, alloc_size, SZ_4K,
+			res_trk_get_mem_type());
+		if (IS_ERR_OR_NULL(addr->alloc_handle)) {
+			DDL_MSG_ERROR("%s() :DDL ION alloc failed\n",
+						 __func__);
+			goto bail_out;
+		}
+		rc = ion_phys(ddl_context->video_ion_client,
+				addr->alloc_handle, &phyaddr,
+				 &len);
+		if (rc || !phyaddr) {
+			DDL_MSG_ERROR("%s():DDL ION client physical failed\n",
+						 __func__);
+			goto free_acm_ion_alloc;
+		}
+		addr->alloced_phys_addr = phyaddr;
+	} else {
+		addr->alloced_phys_addr = (phys_addr_t)
+		allocate_contiguous_memory_nomap(alloc_size,
+			res_trk_get_mem_type(), SZ_4K);
+		if (!addr->alloced_phys_addr) {
+			DDL_MSG_ERROR("%s() : acm alloc failed (%d)\n",
+					 __func__, alloc_size);
+			goto bail_out;
+		}
 	}
 	DDL_MSG_LOW("%s() : pmem alloc physical base addr/sz 0x%x / %d\n",\
 		__func__, (u32)addr->physical_base_addr, alloc_size);
