@@ -18,6 +18,11 @@
 /dev/akm8975_daemon     0640    compass     system
 /dev/akm8975_aot        0640    compass     system
 
+#video
+/dev/msm_vidc_reg       0660    system      audio
+/dev/msm_vidc_dec       0660    system      audio
+/dev/msm_vidc_enc       0660    system      audio
+
 #audio
 /dev/htc-acdb           0660    system      audio
 /dev/msm_audio_dev_ctrl 0660    system      audio
@@ -33,9 +38,6 @@
 /dev/msm_pcm_in*        0660    system      audio
 /dev/msm_mp3*           0660    system      audio
 /dev/htc-acoustic       0660    system      audio
-/dev/msm_vidc_reg       0660    system      audio
-/dev/msm_vidc_dec       0660    system      audio
-/dev/msm_vidc_enc       0660    system      audio
 /dev/tpa2051d3          0660    system      audio
 /dev/msm_amrnb          0660    system      audio
 /dev/msm_amrwb          0660    system      audio
@@ -54,6 +56,7 @@
 /dev/msm_preproc_ctl    0660    system      audio
 /dev/msm_a2dp_in        0640    system      audio
 /dev/msm_amrnb_in       0640    system      audio
+/dev/htc-acoustic       0660    system      audio
 
 #graphics
 /dev/msm_rotator        0660    system      graphics
@@ -68,6 +71,3 @@
 /dev/ttyHS0             0600    bluetooth   bluetooth
 /dev/ttyMSM0            0600    bluetooth   bluetooth
 /dev/uinput             0660    system      bluetooth
-
-#camera
-/dev/pmem_smipool*      0660    system      camera
