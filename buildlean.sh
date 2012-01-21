@@ -115,7 +115,7 @@ cp -R arch/arm/boot/zImage ../../../$ACEREPO/kernel/kernel
 if [ -e ../../../$ACEREPO/kernel/kernel ]; then
 cd ../../../$ACEREPO
 git commit -a -m "Automated Kernel Update - ${PROPER}"
-git push git@github.com:$ACEGITHUB HEAD:ics
+git push git@github.com:$ACEGITHUB HEAD:ics -f
 fi
 
 else
