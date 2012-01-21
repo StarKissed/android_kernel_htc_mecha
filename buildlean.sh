@@ -22,7 +22,7 @@ MSMREPO=github-aosp_source/android_device_htc_msm7x30-common
 CPU_JOB_NUM=16
 TOOLCHAIN_PREFIX=arm-none-eabi-
 
-echo "Config Name? ";
+echo "Config Name? "
 ls config
 read configfile
 cp -R config/$configfile .config
@@ -144,7 +144,7 @@ if [ ! -e nsio*/*.ko ]; then
 cp nsio*/*.ko zip.aosp/system/lib/modules
 fi
 cp fs/cifs/cifs.ko zip.aosp/system/lib/modules
-cp arch/arm/boot/zImage mkboot.aosp/
+cp arch/arm/boot/zImage mkboot.aosp
 
 cd mkboot.aosp
 echo "making boot image"
