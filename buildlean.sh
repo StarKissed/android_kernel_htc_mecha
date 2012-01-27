@@ -14,9 +14,9 @@ KERNELSPEC=leanKernel-tbolt-ics
 ANDROIDREPO=/Volumes/android/github-aosp_source/android/Kernel
 DROIDGITHUB=TwistedUmbrella/android.git
 MECHAREPO=github-aosp_source/android_device_htc_mecha
-MECHAGITHUB=TwistedUmbrella/android_device_htc_mecha.git
+MECHAGITHUB=TwistedPlayground/android_device_htc_mecha.git
 ACEREPO=github-aosp_source/android_device_htc_ace
-ACEGITHUB=TwistedUmbrella/android_device_htc_ace.git
+ACEGITHUB=TwistedPlayground/android_device_htc_ace.git
 MSMREPO=github-aosp_source/android_device_htc_msm7x30-common
 
 CPU_JOB_NUM=16
