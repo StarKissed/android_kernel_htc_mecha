@@ -4,10 +4,10 @@ on early-fs
     mkdir /data 0771 system system
     mkdir /cache 0770 system cache
     mkdir /devlog 0700 root root
-    mount ext4 /dev/block/mmcblk0p25 /system noatime ro noauto_da_alloc,barrier=0,data=writeback
-    mount ext4 /dev/block/mmcblk0p26 /data noatime data=ordered,barrier=1,noauto_da_alloc
-    mount ext4 /dev/block/mmcblk0p27 /cache noatime noauto_da_alloc,barrier=0,data=writeback 
-    mount ext4 /dev/block/mmcblk0p29 /devlog noatime data=ordered,noauto_da_alloc,barrier=0
+    mount ext4 /dev/block/mmcblk0p25 /system wait ro noatime nodiratime barrier=0 nouser_xattr
+    mount ext4 /dev/block/mmcblk0p26 /data wait noatime nodiratime nosuid nodev barrier=0 noauto_da_alloc nouser_xattr
+    mount ext4 /dev/block/mmcblk0p27 /cache wait noatime nodiratime nosuid nodev barrier=0 nouser_xattr
+    mount ext4 /dev/block/mmcblk0p28 /devlog wait noatime nodiratime nosuid nodev barrier=0 nouser_xattr
 
 import init.msm7x30.usb.rc
 
@@ -87,15 +87,6 @@ on boot
     # 9k modem
     chown system system /sys/module/msm72k_udc/parameters/mdm_port_enabled
     chown system system /sys/module/smsc251x/parameters/hub_enabled
-
-    # Permissions for Camera
-    chmod 0666 /dev/msm_camera/config0
-    chmod 0666 /dev/msm_camera/control0
-    chmod 0666 /dev/msm_camera/frame0
-    chmod 0666 /dev/msm_camera/config1
-    chmod 0666 /dev/msm_camera/control1
-    chmod 0666 /dev/msm_camera/frame1
-    chmod 0666 /dev/graphics/fb0
 
 service ril-ims-daemon /system/bin/rild_ims
     class main

@@ -473,8 +473,6 @@ service drm /system/bin/drmserver
     group system inet drmrpc
 
 service sysinit /system/bin/logwrapper /system/xbin/run-parts /system/etc/init.d
-    user root
-    group root
     disabled
     oneshot
 
