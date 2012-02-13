@@ -11,8 +11,8 @@ PROPER=`echo $2 | sed 's/\([a-z]\)\([a-zA-Z0-9]*\)/\u\1\2/g'`
 HANDLE=TwistedZero
 BUILDDIR=/Volumes/android/android-tzb_ics4.0.1
 KERNELSPEC=leanKernel-tbolt-ics
-ANDROIDREPO=/Volumes/android/github-aosp_source/android/Kernel
-DROIDGITHUB=TwistedUmbrella/android.git
+ANDROIDREPO=/Volumes/android/Twisted-Playground
+DROIDGITHUB=TwistedUmbrella/Twisted-Playground.git
 MECHAREPO=github-aosp_source/android_device_htc_mecha
 MECHAGITHUB=TwistedPlayground/android_device_htc_mecha.git
 ACEREPO=github-aosp_source/android_device_htc_ace
@@ -157,7 +157,9 @@ rm *.zip
 zip -r $zipfile *
 rm /tmp/*.zip
 cp *.zip /tmp
-cp -R $BUILDDIR/kernel/$KERNELSPEC/zip.aosp/$zipfile $ANDROIDREPO/$zipfile
+cp -R $BUILDDIR/kernel/$KERNELSPEC/zip.aosp/$zipfile $ANDROIDREPO/Kernel/$zipfile
+cd $ANDROIDREPO
+git checkout gh-pages
 git commit -a -m "Automated Kernel Update - Patch"
 git push git@github.com:$DROIDGITHUB HEAD:ics
 
