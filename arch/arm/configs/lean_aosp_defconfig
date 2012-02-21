@@ -1,7 +1,7 @@
 #
 # Automatically generated make config: don't edit
 # Linux kernel version: 2.6.35.14
-# Sun Feb 12 19:37:37 2012
+# Tue Feb 14 17:52:21 2012
 #
 CONFIG_ARM=y
 CONFIG_SYS_SUPPORTS_APM_EMULATION=y
@@ -293,7 +293,7 @@ CONFIG_ARCH_MSM7X30_LTE=y
 # CONFIG_MACH_GLACIER is not set
 # CONFIG_MACH_SAGA is not set
 # CONFIG_MACH_ICON is not set
-CONFIG_MACH_SPADE=y
+# CONFIG_MACH_SPADE is not set
 # CONFIG_MACH_DYNASTY is not set
 # CONFIG_MACH_FLYER is not set
 # CONFIG_MACH_EXPRESS is not set
@@ -1129,6 +1129,7 @@ CONFIG_DM_CRYPT=y
 # CONFIG_DM_MULTIPATH is not set
 # CONFIG_DM_DELAY is not set
 CONFIG_DM_UEVENT=y
+# CONFIG_DM_CACHE is not set
 CONFIG_NETDEVICES=y
 # CONFIG_IFB is not set
 CONFIG_DUMMY=y

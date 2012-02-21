@@ -7,6 +7,8 @@
 *.s
 *.ko
 *.zip
+*.gzip
+*.lzma
 
 modules.builtin
 
@@ -37,3 +39,5 @@ include/generated
 arch/arm/boot/compressed/lib1funcs.S
 arch/arm/boot/compressed/piggy.gzip
 arch/arm/boot/compressed/vmlinux
+
+Module.symvers
