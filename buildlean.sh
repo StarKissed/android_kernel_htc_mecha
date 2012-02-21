@@ -3,7 +3,7 @@
 # Copyright (C) 2011 Twisted Playground
 
 # This script is designed to compliment .bash_profile code to automate the build process by adding a typical shell command such as:
-# function function buildKernel { cd /Volumes/android/android-tzb_ics4.0.1/kernel/leanKernel-tbolt-ics; echo "Ace, Mecha, Release?"; read device; ./buildlean.sh 1 $device; }
+# function function buildKernel { cd /Volumes/android/android-tzb_ics4.0.1/kernel/leanKernel-tbolt-ics; echo "Mecha, Release?"; read device; ./buildlean.sh 1 $device; }
 # This script is designed by Twisted Playground for use on MacOSX 10.7 but can be modified for other distributions of Mac and Linux
 
 PROPER=`echo $2 | sed 's/\([a-z]\)\([a-zA-Z0-9]*\)/\u\1\2/g'`
@@ -15,8 +15,8 @@ ANDROIDREPO=/Volumes/android/Twisted-Playground
 DROIDGITHUB=TwistedUmbrella/Twisted-Playground.git
 MECHAREPO=github-aosp_source/android_device_htc_mecha
 MECHAGITHUB=TwistedPlayground/android_device_htc_mecha.git
-ACEREPO=github-aosp_source/android_device_htc_ace
-ACEGITHUB=TwistedPlayground/android_device_htc_ace.git
+ICSREPO=github-aosp_source/android_system_core
+SPDTWKR=TwistedPlayground/ScriptFusion
 MSMREPO=github-aosp_source/android_device_htc_msm7x30-common
 
 CPU_JOB_NUM=16
@@ -27,8 +27,9 @@ ls config
 read configfile
 cp -R config/$configfile .config
 
-cp -R ../../../$ACEREPO/kernel/init.spade.rc $BUILDDIR/kernel/$KERNELSPEC/mkboot.aosp/boot.img-ramdisk
-cp -R ../../../$ACEREPO/kernel/ueventd.spade.rc $BUILDDIR/kernel/$KERNELSPEC/mkboot.aosp/boot.img-ramdisk
+cp -R ../../../$ICSREPO/rootdir/init.rc $BUILDDIR/kernel/$KERNELSPEC/mkboot.aosp/boot.img-ramdisk
+cp -R ../../../$ICSREPO/rootdir/ueventd.rc $BUILDDIR/kernel/$KERNELSPEC/mkboot.aosp/boot.img-ramdisk
+cp -R ../../../$SPDTWKR/speedtweak.sh $BUILDDIR/kernel/$KERNELSPEC/mkboot.aosp/boot.img-ramdisk/sbin
 cp -R ../../../$MECHAREPO/kernel/init.mecha.rc $BUILDDIR/kernel/$KERNELSPEC/mkboot.aosp/boot.img-ramdisk
 cp -R ../../../$MECHAREPO/kernel/ueventd.mecha.rc $BUILDDIR/kernel/$KERNELSPEC/mkboot.aosp/boot.img-ramdisk
 cp -R ../../../$MSMREPO/kernel/init.msm7x30.usb.rc $BUILDDIR/kernel/$KERNELSPEC/mkboot.aosp/boot.img-ramdisk
@@ -85,37 +86,6 @@ if [ -e ../../../$MECHAREPO/kernel/kernel ]; then
 cd ../../../$MECHAREPO
 git commit -a -m "Automated Kernel Update - ${PROPER}"
 git push git@github.com:$MECHAGITHUB HEAD:ics
-fi
-
-elif [ "$2" == "ace" ]; then
-
-echo "adding to build"
-
-if [ ! -e ../../../$ACEREPO/kernel ]; then
-mkdir ../../../$ACEREPO/kernel
-fi
-if [ ! -e ../../../$ACEREPO/kernel/lib ]; then
-mkdir ../../../$ACEREPO/kernel/lib
-fi
-if [ ! -e ../../../$ACEREPO/kernel/lib/modules ]; then
-mkdir ../../../$ACEREPO/kernel/lib/modules
-fi
-
-cp -R drivers/net/wireless/bcm4329/bcm4329.ko ../../../$ACEREPO/kernel/lib/modules
-cp -R drivers/net/tun.ko ../../../$ACEREPO/kernel/lib/modules
-cp -R drivers/staging/zram/zram.ko ../../../$ACEREPO/kernel/lib/modules
-cp -R lib/lzo/lzo_decompress.ko ../../../$ACEREPO/kernel/lib/modules
-cp -R lib/lzo/lzo_compress.ko ../../../$MECHAREPO/kernel/lib/modules
-if [ ! -e nsio*/*.ko ]; then
-cp -R nsio*/*.ko ../../../$ACEREPO/kernel/lib/modules
-fi
-cp -R fs/cifs/cifs.ko ../../../$ACEREPO/kernel/lib/modules
-cp -R arch/arm/boot/zImage ../../../$ACEREPO/kernel/kernel
-
-if [ -e ../../../$ACEREPO/kernel/kernel ]; then
-cd ../../../$ACEREPO
-git commit -a -m "Automated Kernel Update - ${PROPER}"
-git push git@github.com:$ACEGITHUB HEAD:ics -f
 fi
 
 else
