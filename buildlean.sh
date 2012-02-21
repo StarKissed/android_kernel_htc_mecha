@@ -125,12 +125,12 @@ cp boot.img ../zip.aosp
 cd ../zip.aosp
 rm *.zip
 zip -r $zipfile *
-rm /tmp/*.zip
-cp *.zip /tmp
 cp -R $BUILDDIR/kernel/$KERNELSPEC/zip.aosp/$zipfile $ANDROIDREPO/Kernel/$zipfile
 cd $ANDROIDREPO
 git checkout gh-pages
-git commit -a -m "Automated Kernel Update - Patch"
+git commit -a -m "Automated Mecha Kernel Build - Patch"
 git push git@github.com:$DROIDGITHUB HEAD:ics
 
 fi
+
+cd $BUILDDIR/kernel/$KERNELSPEC
