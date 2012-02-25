@@ -16,7 +16,7 @@ DROIDGITHUB=TwistedUmbrella/Twisted-Playground.git
 MECHAREPO=github-aosp_source/android_device_htc_mecha
 MECHAGITHUB=TwistedPlayground/android_device_htc_mecha.git
 ICSREPO=github-aosp_source/android_system_core
-SPDTWKR=TwistedPlayground/ScriptFusion
+SPDTWKR=Twisted-Playground/ScriptFusion
 MSMREPO=github-aosp_source/android_device_htc_msm7x30-common
 
 CPU_JOB_NUM=16
