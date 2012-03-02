@@ -854,8 +854,8 @@ static u32 ddl_get_dec_property
                                                         DDL_TILE_ALIGN_HEIGHT);
                                         }
 					*(struct vcd_property_frame_size *)
-					    property_value =
-					    decoder->client_frame_size;
+					    	property_value =
+					    	decoder->client_frame_size;
 					vcd_status = VCD_S_SUCCESS;
 			}
 			break;
