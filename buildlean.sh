@@ -36,7 +36,7 @@ cp -R ../../../$MSMREPO/kernel/init.msm7x30.usb.rc $BUILDDIR/kernel/$KERNELSPEC/
 
 make clean -j$CPU_JOB_NUM
 
-sed -i s/CONFIG_LOCALVERSION=\"-"$HANDLE"-.*\"/CONFIG_LOCALVERSION=\"-"$HANDLE"-AOSP\"/ .config
+sed -i s/CONFIG_LOCALVERSION=\"-"$HANDLE"-.*\"/CONFIG_LOCALVERSION=\"-"$HANDLE"-Mecha\"/ .config
 
 if [ $1 -eq 2 ]; then
 sed -i "s/^.*UNLOCK_184.*$/CONFIG_UNLOCK_184MHZ=n/" .config
