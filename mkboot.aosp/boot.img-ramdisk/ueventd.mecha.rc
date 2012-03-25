@@ -29,6 +29,9 @@
 /dev/adsp/*             0660    system      audio
 /dev/snd/*              0660    system      audio
 /dev/htc-acoustic       0660    system      audio
+/dev/msm_fm             0660    system      audio
+/dev/msm_amrnb*         0660    system      audio
+/dev/msm_aac*           0660    system      audio
 
 #graphics
 /dev/msm_rotator        0660    system      graphics
@@ -46,4 +49,4 @@
 
 #camera
 /dev/gemini0            0660    system      camera
-/dev/msm_camera/*       0666    system      camera
+/dev/msm_camera/*       0660    system      camera
