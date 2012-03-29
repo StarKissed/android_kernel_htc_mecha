@@ -9,15 +9,14 @@
 PROPER=`echo $2 | sed 's/\([a-z]\)\([a-zA-Z0-9]*\)/\u\1\2/g'`
 
 HANDLE=TwistedZero
-BUILDDIR=/Volumes/android/android-tzb_ics4.0.1
-KERNELSPEC=leanKernel-tbolt-ics
+KERNELSPEC=/Volumes/android/leanKernel-tbolt-ics
 ANDROIDREPO=/Volumes/android/Twisted-Playground
 DROIDGITHUB=TwistedUmbrella/Twisted-Playground.git
-MECHAREPO=github-aosp_source/android_device_htc_mecha
-MECHAGITHUB=TwistedPlayground/android_device_htc_mecha.git
-ICSREPO=github-aosp_source/android_system_core
-SPDTWKR=Twisted-Playground/ScriptFusion
-MSMREPO=github-aosp_source/android_device_htc_msm7x30-common
+MECHAREPO=/Volumes/android/github-aosp_source/android_device_htc_mecha
+MECHAGITHUB=ThePlayground/android_device_htc_mecha.git
+ICSREPO=/Volumes/android/github-aosp_source/android_system_core
+SPDTWKR=/Volumes/android/Twisted-Playground/ScriptFusion
+MSMREPO=/Volumes/android/github-aosp_source/android_device_htc_msm7x30-common
 
 CPU_JOB_NUM=16
 TOOLCHAIN_PREFIX=arm-none-eabi-
@@ -27,12 +26,12 @@ ls config
 read configfile
 cp -R config/$configfile .config
 
-cp -R ../../../$ICSREPO/rootdir/init.rc $BUILDDIR/kernel/$KERNELSPEC/mkboot.aosp/boot.img-ramdisk
-cp -R ../../../$ICSREPO/rootdir/ueventd.rc $BUILDDIR/kernel/$KERNELSPEC/mkboot.aosp/boot.img-ramdisk
-cp -R ../../../$SPDTWKR/speedtweak.sh $BUILDDIR/kernel/$KERNELSPEC/mkboot.aosp/boot.img-ramdisk/sbin
-cp -R ../../../$MECHAREPO/kernel/init.mecha.rc $BUILDDIR/kernel/$KERNELSPEC/mkboot.aosp/boot.img-ramdisk
-cp -R ../../../$MECHAREPO/kernel/ueventd.mecha.rc $BUILDDIR/kernel/$KERNELSPEC/mkboot.aosp/boot.img-ramdisk
-cp -R ../../../$MSMREPO/kernel/init.msm7x30.usb.rc $BUILDDIR/kernel/$KERNELSPEC/mkboot.aosp/boot.img-ramdisk
+cp -R $ICSREPO/rootdir/init.rc $KERNELSPEC/mkboot.aosp/boot.img-ramdisk
+cp -R $ICSREPO/rootdir/ueventd.rc $KERNELSPEC/mkboot.aosp/boot.img-ramdisk
+cp -R $SPDTWKR/speedtweak.sh $KERNELSPEC/mkboot.aosp/boot.img-ramdisk/sbin
+cp -R $MECHAREPO/kernel/init.mecha.rc $KERNELSPEC/mkboot.aosp/boot.img-ramdisk
+cp -R $MECHAREPO/kernel/ueventd.mecha.rc $KERNELSPEC/mkboot.aosp/boot.img-ramdisk
+cp -R $MSMREPO/kernel/init.msm7x30.usb.rc $KERNELSPEC/mkboot.aosp/boot.img-ramdisk
 
 make clean -j$CPU_JOB_NUM
 
@@ -61,31 +60,31 @@ if [ "$2" == "mecha" ]; then
 
 echo "adding to build"
 
-if [ ! -e ../../../$MECHAREPO/kernel ]; then
-mkdir ../../../$MECHAREPO/kernel
+if [ ! -e $MECHAREPO/kernel ]; then
+mkdir $MECHAREPO/kernel
 fi
-if [ ! -e ../../../$MECHAREPO/kernel/lib ]; then
-mkdir ../../../$MECHAREPO/kernel/lib
+if [ ! -e $MECHAREPO/kernel/lib ]; then
+mkdir $MECHAREPO/kernel/lib
 fi
-if [ ! -e ../../../$MECHAREPO/kernel/lib/modules ]; then
-mkdir ../../../$MECHAREPO/kernel/lib/modules
+if [ ! -e $MECHAREPO/kernel/lib/modules ]; then
+mkdir $MECHAREPO/kernel/lib/modules
 fi
 
-cp -R drivers/net/wireless/bcm4329/bcm4329.ko ../../../$MECHAREPO/kernel/lib/modules
-cp -R drivers/net/tun.ko ../../../$MECHAREPO/kernel/lib/modules
-cp -R drivers/staging/zram/zram.ko ../../../$MECHAREPO/kernel/lib/modules
-cp -R lib/lzo/lzo_decompress.ko ../../../$MECHAREPO/kernel/lib/modules
-cp -R lib/lzo/lzo_compress.ko ../../../$MECHAREPO/kernel/lib/modules
+cp -R drivers/net/wireless/bcm4329/bcm4329.ko $MECHAREPO/kernel/lib/modules
+cp -R drivers/net/tun.ko $MECHAREPO/kernel/lib/modules
+cp -R drivers/staging/zram/zram.ko $MECHAREPO/kernel/lib/modules
+cp -R lib/lzo/lzo_decompress.ko $MECHAREPO/kernel/lib/modules
+cp -R lib/lzo/lzo_compress.ko $MECHAREPO/kernel/lib/modules
 if [ ! -e nsio*/*.ko ]; then
-cp -R nsio*/*.ko ../../../$MECHAREPO/kernel/lib/modules
+cp -R nsio*/*.ko $MECHAREPO/kernel/lib/modules
 fi
-cp -R fs/cifs/cifs.ko ../../../$MECHAREPO/kernel/lib/modules
-cp -R arch/arm/boot/zImage ../../../$MECHAREPO/kernel/kernel
+cp -R fs/cifs/cifs.ko $MECHAREPO/kernel/lib/modules
+cp -R arch/arm/boot/zImage $MECHAREPO/kernel/kernel
 
-if [ -e ../../../$MECHAREPO/kernel/kernel ]; then
-cd ../../../$MECHAREPO
+if [ -e $MECHAREPO/kernel/kernel ]; then
+cd $MECHAREPO
 git commit -a -m "Automated Kernel Update - ${PROPER}"
-git push git@github.com:$MECHAGITHUB HEAD:ics
+git push git@github.com:$MECHAGITHUB HEAD:ics -f
 fi
 
 else
@@ -125,12 +124,12 @@ cp boot.img ../zip.aosp
 cd ../zip.aosp
 rm *.zip
 zip -r $zipfile *
-cp -R $BUILDDIR/kernel/$KERNELSPEC/zip.aosp/$zipfile $ANDROIDREPO/Kernel/$zipfile
+cp -R $KERNELSPEC/zip.aosp/$zipfile $ANDROIDREPO/Kernel/$zipfile
 cd $ANDROIDREPO
 git checkout gh-pages
 git commit -a -m "Automated Mecha Kernel Build - Patch"
-git push git@github.com:$DROIDGITHUB HEAD:ics
+git push git@github.com:$DROIDGITHUB HEAD:ics -f
 
 fi
 
-cd $BUILDDIR/kernel/$KERNELSPEC
+cd $KERNELSPEC

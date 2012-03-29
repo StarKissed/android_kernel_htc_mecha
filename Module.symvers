@@ -2020,7 +2020,6 @@
 0x00000000	msm_rpc_client_req2	vmlinux	EXPORT_SYMBOL
 0x00000000	lzo1x_decompress_safe	lib/lzo/lzo_decompress	EXPORT_SYMBOL_GPL
 0x00000000	sdio_writesb	vmlinux	EXPORT_SYMBOL_GPL
-0x00000000	genlock_release_lock	vmlinux	EXPORT_SYMBOL
 0x00000000	scatterwalk_done	vmlinux	EXPORT_SYMBOL_GPL
 0x00000000	timecompare_transform	vmlinux	EXPORT_SYMBOL_GPL
 0x00000000	mtd_table_mutex	vmlinux	EXPORT_SYMBOL_GPL

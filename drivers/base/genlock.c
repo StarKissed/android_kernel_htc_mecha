@@ -1,5 +1,4 @@
-/* Copyright (c) 2011, Code Aurora Forum. All rights reserved.
- * Copyright (C) 2011 Sony Ericsson Mobile Communications AB.
+/* Copyright (c) 2011-2012, Code Aurora Forum. All rights reserved.
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License version 2 and
@@ -112,6 +111,11 @@ struct genlock *genlock_create_lock(struct genlock_handle *handle)
 {
 	struct genlock *lock;
 
+	if (IS_ERR_OR_NULL(handle)) {
+		GENLOCK_LOG_ERR("Invalid handle\n");
+		return ERR_PTR(-EINVAL);
+	}
+
 	if (handle->lock != NULL) {
 		GENLOCK_LOG_ERR("Handle already has a lock attached\n");
 		return ERR_PTR(-EINVAL);
@@ -178,6 +182,11 @@ struct genlock *genlock_attach_lock(struct genlock_handle *handle, int fd)
 {
 	struct file *file;
 	struct genlock *lock;
+
+	if (IS_ERR_OR_NULL(handle)) {
+		GENLOCK_LOG_ERR("Invalid handle\n");
+		return ERR_PTR(-EINVAL);
+	}
 
 	if (handle->lock != NULL) {
 		GENLOCK_LOG_ERR("Handle already has a lock attached\n");
@@ -280,7 +289,7 @@ static int _genlock_lock(struct genlock *lock, struct genlock_handle *handle,
 {
 	unsigned long irqflags;
 	int ret = 0;
-	unsigned int ticks = msecs_to_jiffies(timeout);
+	unsigned long ticks = msecs_to_jiffies(timeout);
 
 	spin_lock_irqsave(&lock->lock, irqflags);
 
@@ -351,7 +360,7 @@ static int _genlock_lock(struct genlock *lock, struct genlock_handle *handle,
 	/* Wait while the lock remains in an incompatible state */
 
 	while (lock->state != _UNLOCKED) {
-		unsigned int elapsed;
+		signed long elapsed;
 
 		spin_unlock_irqrestore(&lock->lock, irqflags);
 
@@ -365,7 +374,7 @@ static int _genlock_lock(struct genlock *lock, struct genlock_handle *handle,
 			goto done;
 		}
 
-		ticks = elapsed;
+		ticks = (unsigned long) elapsed;
 	}
 
 dolock:
@@ -394,8 +403,16 @@ done:
 int genlock_lock(struct genlock_handle *handle, int op, int flags,
 	uint32_t timeout)
 {
-	struct genlock *lock = handle->lock;
+	struct genlock *lock;
+
 	int ret = 0;
+
+	if (IS_ERR_OR_NULL(handle)) {
+		GENLOCK_LOG_ERR("Invalid handle\n");
+		return -EINVAL;
+	}
+
+	lock = handle->lock;
 
 	if (lock == NULL) {
 		GENLOCK_LOG_ERR("Handle does not have a lock attached\n");
@@ -428,10 +445,17 @@ EXPORT_SYMBOL(genlock_lock);
 
 int genlock_wait(struct genlock_handle *handle, uint32_t timeout)
 {
-	struct genlock *lock = handle->lock;
+	struct genlock *lock;
 	unsigned long irqflags;
 	int ret = 0;
-	unsigned int ticks = msecs_to_jiffies(timeout);
+	unsigned long ticks = msecs_to_jiffies(timeout);
+
+	if (IS_ERR_OR_NULL(handle)) {
+		GENLOCK_LOG_ERR("Invalid handle\n");
+		return -EINVAL;
+	}
+
+	lock = handle->lock;
 
 	if (lock == NULL) {
 		GENLOCK_LOG_ERR("Handle does not have a lock attached\n");
@@ -451,7 +475,7 @@ int genlock_wait(struct genlock_handle *handle, uint32_t timeout)
 	}
 
 	while (lock->state != _UNLOCKED) {
-		unsigned int elapsed;
+		signed long elapsed;
 
 		spin_unlock_irqrestore(&lock->lock, irqflags);
 
@@ -465,7 +489,7 @@ int genlock_wait(struct genlock_handle *handle, uint32_t timeout)
 			break;
 		}
 
-		ticks = elapsed;
+		ticks = (unsigned long) elapsed;
 	}
 
 done:
@@ -473,12 +497,7 @@ done:
 	return ret;
 }
 
-/**
- * genlock_release_lock - Release a lock attached to a handle
- * @handle - Pointer to the handle holding the lock
- */
-
-void genlock_release_lock(struct genlock_handle *handle)
+static void genlock_release_lock(struct genlock_handle *handle)
 {
 	unsigned long flags;
 
@@ -499,7 +518,6 @@ void genlock_release_lock(struct genlock_handle *handle)
 	handle->lock = NULL;
 	handle->active = 0;
 }
-EXPORT_SYMBOL(genlock_release_lock);
 
 /*
  * Release function called when all references to a handle are released
@@ -591,6 +609,9 @@ static long genlock_dev_ioctl(struct file *filep, unsigned int cmd,
 	struct genlock *lock;
 	int ret;
 
+	if (IS_ERR_OR_NULL(handle))
+		return -EINVAL;
+
 	switch (cmd) {
 	case GENLOCK_IOC_NEW: {
 		lock = genlock_create_lock(handle);
@@ -645,8 +666,13 @@ static long genlock_dev_ioctl(struct file *filep, unsigned int cmd,
 		return genlock_wait(handle, param.timeout);
 	}
 	case GENLOCK_IOC_RELEASE: {
-		genlock_release_lock(handle);
-		return 0;
+		/*
+		 * Return error - this ioctl has been deprecated.
+		 * Locks should only be released when the handle is
+		 * destroyed
+		 */
+		GENLOCK_LOG_ERR("Deprecated RELEASE ioctl called\n");
+		return -EINVAL;
 	}
 	default:
 		GENLOCK_LOG_ERR("Invalid ioctl\n");
