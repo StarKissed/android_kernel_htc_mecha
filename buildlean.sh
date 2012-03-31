@@ -81,7 +81,7 @@ fi
 cp -R fs/cifs/cifs.ko $MECHAREPO/kernel/lib/modules
 cp -R arch/arm/boot/zImage $MECHAREPO/kernel/kernel
 
-if [ -e $MECHAREPO/kernel/kernel ]; then
+if [ -e arch/arm/boot/zImage ]; then
 cd $MECHAREPO
 git commit -a -m "Automated Kernel Update - ${PROPER}"
 git push git@github.com:$MECHAGITHUB HEAD:ics -f
@@ -119,6 +119,7 @@ cd mkboot.aosp
 echo "making boot image"
 ./img.sh
 
+if [ -e arch/arm/boot/zImage ]; then
 echo "making zip file"
 cp boot.img ../zip.aosp
 cd ../zip.aosp
@@ -129,6 +130,7 @@ cd $ANDROIDREPO
 git checkout gh-pages
 git commit -a -m "Automated Patch Kernel Build - ${PROPER}"
 git push git@github.com:$DROIDGITHUB HEAD:ics -f
+fi
 
 fi
 
