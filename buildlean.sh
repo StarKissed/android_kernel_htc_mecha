@@ -127,7 +127,7 @@ zip -r $zipfile *
 cp -R $KERNELSPEC/zip.aosp/$zipfile $ANDROIDREPO/Kernel/$zipfile
 cd $ANDROIDREPO
 git checkout gh-pages
-git commit -a -m "Automated ${PROPER} Kernel Build - Patch"
+git commit -a -m "Automated Patch Kernel Build - ${PROPER}"
 git push git@github.com:$DROIDGITHUB HEAD:ics -f
 
 fi
