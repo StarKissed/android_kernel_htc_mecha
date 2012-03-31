@@ -4,7 +4,7 @@ obj-m += nsio.o
 KERNEL_SOURCE = ../
 
 # Edit as needed for your cross-compiler
-CROSS_COMPILE   = /usr/bin/arm-linux-gnueabi-
+CROSS_COMPILE   = arm-none-eabi-
 ARCH            = arm
 
 all:
