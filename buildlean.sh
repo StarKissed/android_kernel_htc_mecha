@@ -30,18 +30,9 @@ cp -R $SPDTWKR/speedtweak.sh $KERNELSPEC/mkboot.aosp/boot.img-ramdisk/sbin
 cp -R $MECHAREPO/kernel/init.mecha.rc $KERNELSPEC/mkboot.aosp/boot.img-ramdisk
 cp -R $MECHAREPO/kernel/ueventd.mecha.rc $KERNELSPEC/mkboot.aosp/boot.img-ramdisk
 cp -R $MSMREPO/kernel/init.msm7x30.usb.rc $KERNELSPEC/mkboot.aosp/boot.img-ramdisk
+zipfile=$HANDLE"_leanKernel_184Mhz_AOSP.zip"
 
 make clean -j$CPU_JOB_NUM
-
-sed -i s/CONFIG_LOCALVERSION=\"-"$HANDLE"-.*\"/CONFIG_LOCALVERSION=\"-"$HANDLE"-Mecha\"/ .config
-
-if [ $1 -eq 2 ]; then
-sed -i "s/^.*UNLOCK_184.*$/CONFIG_UNLOCK_184MHZ=n/" .config
-zipfile=$HANDLE"_leanKernel_AOSP.zip"
-else
-sed -i "s/^.*UNLOCK_184.*$/CONFIG_UNLOCK_184MHZ=y/" .config
-zipfile=$HANDLE"_leanKernel_184Mhz_AOSP.zip"
-fi
 
 make -j$CPU_JOB_NUM ARCH=arm CROSS_COMPILE=$TOOLCHAIN_PREFIX
 
@@ -57,16 +48,6 @@ cp .config arch/arm/configs/lean_aosp_defconfig
 if [ "$2" == "mecha" ]; then
 
 echo "adding to build"
-
-if [ ! -e $MECHAREPO/kernel ]; then
-mkdir $MECHAREPO/kernel
-fi
-if [ ! -e $MECHAREPO/kernel/lib ]; then
-mkdir $MECHAREPO/kernel/lib
-fi
-if [ ! -e $MECHAREPO/kernel/lib/modules ]; then
-mkdir $MECHAREPO/kernel/lib/modules
-fi
 
 cp -R drivers/net/wireless/bcm4329/bcm4329.ko $MECHAREPO/kernel/lib/modules
 cp -R drivers/net/tun.ko $MECHAREPO/kernel/lib/modules
