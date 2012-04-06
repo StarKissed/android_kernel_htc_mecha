@@ -15,6 +15,7 @@ MECHAGITHUB=ThePlayground/android_device_htc_mecha.git
 ICSREPO=/Volumes/android/github-aosp_source/android_system_core
 SPDTWKR=/Volumes/android/Twisted-Playground/ScriptFusion
 MSMREPO=/Volumes/android/github-aosp_source/android_device_htc_msm7x30-common
+zipfile=$HANDLE"_leanKernel_184Mhz_AOSP.zip"
 
 CPU_JOB_NUM=16
 TOOLCHAIN_PREFIX=arm-none-eabi-
@@ -30,7 +31,6 @@ cp -R $SPDTWKR/speedtweak.sh $KERNELSPEC/mkboot.aosp/boot.img-ramdisk/sbin
 cp -R $MECHAREPO/kernel/init.mecha.rc $KERNELSPEC/mkboot.aosp/boot.img-ramdisk
 cp -R $MECHAREPO/kernel/ueventd.mecha.rc $KERNELSPEC/mkboot.aosp/boot.img-ramdisk
 cp -R $MSMREPO/kernel/init.msm7x30.usb.rc $KERNELSPEC/mkboot.aosp/boot.img-ramdisk
-zipfile=$HANDLE"_leanKernel_184Mhz_AOSP.zip"
 
 make clean -j$CPU_JOB_NUM
 
@@ -47,20 +47,17 @@ cp .config arch/arm/configs/lean_aosp_defconfig
 
 if [ "$2" == "mecha" ]; then
 
+if [ -e arch/arm/boot/zImage ]; then
+
 echo "adding to build"
 
-cp -R drivers/net/wireless/bcm4329/bcm4329.ko $MECHAREPO/kernel/lib/modules
-cp -R drivers/net/tun.ko $MECHAREPO/kernel/lib/modules
-cp -R drivers/staging/zram/zram.ko $MECHAREPO/kernel/lib/modules
-cp -R lib/lzo/lzo_decompress.ko $MECHAREPO/kernel/lib/modules
-cp -R lib/lzo/lzo_compress.ko $MECHAREPO/kernel/lib/modules
-if [ ! -e nsio*/*.ko ]; then
-cp -R nsio*/*.ko $MECHAREPO/kernel/lib/modules
-fi
-cp -R fs/cifs/cifs.ko $MECHAREPO/kernel/lib/modules
 cp -R arch/arm/boot/zImage $MECHAREPO/kernel/kernel
+rm -r $MECHAREPO/kernel/lib/modules
+mkdir -r $MECHAREPO/kernel/lib/modules
+for j in $(find . -name "*.ko"); do
+cp -R "${j}" $MECHAREPO/kernel/lib/modules
+done
 
-if [ -e arch/arm/boot/zImage ]; then
 cd $MECHAREPO
 git commit -a -m "Automated Kernel Update - ${PROPER}"
 git push git@github.com:$MECHAGITHUB HEAD:ics -f
@@ -68,12 +65,6 @@ fi
 
 else
 
-if [ ! -e zip.aosp ]; then
-mkdir zip.aosp
-fi
-if [ ! -e zip.aosp/system ]; then
-mkdir zip.aosp/system
-fi
 if [ ! -e zip.aosp/system/lib ]; then
 mkdir zip.aosp/system/lib
 fi
@@ -83,24 +74,20 @@ else
 rm -r zip.aosp/system/lib/modules
 mkdir zip.aosp/system/lib/modules
 fi
-cp drivers/net/wireless/bcm4329/bcm4329.ko zip.aosp/system/lib/modules
-cp drivers/net/tun.ko zip.aosp/system/lib/modules
-cp drivers/staging/zram/zram.ko zip.aosp/system/lib/modules
-cp lib/lzo/lzo_decompress.ko zip.aosp/system/lib/modules
-cp lib/lzo/lzo_compress.ko zip.aosp/system/lib/modules
-if [ ! -e nsio*/*.ko ]; then
-cp nsio*/*.ko zip.aosp/system/lib/modules
-fi
-cp fs/cifs/cifs.ko zip.aosp/system/lib/modules
-cp arch/arm/boot/zImage mkboot.aosp
+
+if [ -e arch/arm/boot/zImage ]; then
+
+for j in $(find . -name "*.ko"); do
+cp -R "${j}" zip.aosp/system/lib/modules
+done
+cp -R arch/arm/boot/zImage mkboot.aosp
 
 cd mkboot.aosp
 echo "making boot image"
 ./img.sh
 
-if [ -e arch/arm/boot/zImage ]; then
 echo "making zip file"
-cp boot.img ../zip.aosp
+cp -R boot.img ../zip.aosp
 cd ../zip.aosp
 rm *.zip
 zip -r $zipfile *
