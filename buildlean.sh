@@ -53,7 +53,7 @@ echo "adding to build"
 
 cp -R arch/arm/boot/zImage $MECHAREPO/kernel/kernel
 rm -r $MECHAREPO/kernel/lib/modules
-mkdir -r $MECHAREPO/kernel/lib/modules
+mkdir $MECHAREPO/kernel/lib/modules
 for j in $(find . -name "*.ko"); do
 cp -R "${j}" $MECHAREPO/kernel/lib/modules
 done
