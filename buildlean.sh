@@ -45,15 +45,14 @@ find . -name "*.ko" | xargs ${TOOLCHAIN_PREFIX}strip --strip-unneeded
 
 cp .config arch/arm/configs/lean_aosp_defconfig
 
-if [ "$2" == "mecha" ]; then
-
 if [ -e arch/arm/boot/zImage ]; then
+
+if [ "$2" == "mecha" ]; then
 
 echo "adding to build"
 
 cp -R arch/arm/boot/zImage $MECHAREPO/kernel/kernel
-rm -r $MECHAREPO/kernel/lib/modules
-mkdir $MECHAREPO/kernel/lib/modules
+rm -r $MECHAREPO/kernel/lib/modules/*
 for j in $(find . -name "*.ko"); do
 cp -R "${j}" $MECHAREPO/kernel/lib/modules
 done
@@ -61,7 +60,6 @@ done
 cd $MECHAREPO
 git commit -a -m "Automated Kernel Update - ${PROPER}"
 git push git@github.com:$MECHAGITHUB HEAD:ics -f
-fi
 
 else
 
@@ -74,8 +72,6 @@ else
 rm -r zip.aosp/system/lib/modules
 mkdir zip.aosp/system/lib/modules
 fi
-
-if [ -e arch/arm/boot/zImage ]; then
 
 for j in $(find . -name "*.ko"); do
 cp -R "${j}" zip.aosp/system/lib/modules
@@ -96,6 +92,7 @@ cd $ANDROIDREPO
 git checkout gh-pages
 git commit -a -m "Automated Patch Kernel Build - ${PROPER}"
 git push git@github.com:$DROIDGITHUB HEAD:ics -f
+
 fi
 
 fi
