@@ -1,7 +1,7 @@
 #
 # Automatically generated make config: don't edit
 # Linux kernel version: 2.6.35.14
-# Fri Mar 30 21:38:23 2012
+# Sat Apr  7 02:52:41 2012
 #
 CONFIG_ARM=y
 CONFIG_SYS_SUPPORTS_APM_EMULATION=y
@@ -1147,12 +1147,14 @@ CONFIG_TUN=m
 CONFIG_WLAN=y
 CONFIG_BCM4329_PURE_ANDROID=y
 # CONFIG_HOSTAP is not set
-CONFIG_BCM4329=m
-CONFIG_BCM4329_FW_PATH="/vendor/firmware/fw_bcm4329.bin"
-CONFIG_BCM4329_NVRAM_PATH="/proc/calibration"
+# CONFIG_BCM4329 is not set
 # CONFIG_BCM4329_248 is not set
 # CONFIG_BCM4329_CES is not set
 # CONFIG_BCM4330 is not set
+CONFIG_BCMDHD=m
+CONFIG_BCMDHD_FW_PATH="/vendor/firmware/fw_bcm4329.bin"
+CONFIG_BCMDHD_NVRAM_PATH="/proc/calibration"
+CONFIG_BCMDHD_WEXT=y
 
 #
 # Enable WiMAX (Networking options) to see the WiMAX drivers

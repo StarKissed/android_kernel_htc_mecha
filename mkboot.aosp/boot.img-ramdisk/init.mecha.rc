@@ -3,7 +3,7 @@ import init.msm7x30.usb.rc
 on early-init
     export EXTERNAL_STORAGE /mnt/sdcard
     mkdir /mnt/sdcard 0000 system system
-    symlink /mnt/sdcard /sdcard
+    symlink /mnt/sdcard /sdcardwlan0
 
 on early-fs
 
@@ -20,6 +20,7 @@ on early-fs
 
     symlink /system/vendor/firmware/fw_bcm4329.bin /vendor/firmware/fw_bcm4329.bin
     symlink /system/vendor/firmware/fw_bcm4329_apsta.bin /vendor/firmware/fw_bcm4329_apsta.bin
+    symlink /system/vendor/firmware/fw_bcm4329_p2p.bin /vendor/firmware/fw_bcm4329_p2p.bin
     symlink /system/vendor/firmware/bcm4329.hcd /vendor/firmware/bcm4329.hcd
 
 on init
@@ -137,22 +138,22 @@ service ril-daemon /system/bin/rild
     group radio cache inet misc audio sdcard_rw qcom_oncrpc diag log
 
 service wpa_supplicant /system/bin/logwrapper /system/bin/wpa_supplicant \
-    -Dwext -ieth0 -c/data/misc/wifi/wpa_supplicant.conf
+    -Dwext -iwlan0 -c/data/misc/wifi/wpa_supplicant.conf
 #   we will start as root and wpa_supplicant will switch to user wifi
 #   after setting up the capabilities required for WEXT
 #   user wifi
 #   group wifi inet keystore
     class main
-    socket wpa_eth0 dgram 660 wifi wifi
+    socket wpa_wlan0 dgram 660 wifi wifi
     disabled
     oneshot
 
-service dhcpcd_eth0 /system/bin/dhcpcd -ABKL
+service dhcpcd_wlan0 /system/bin/dhcpcd -ABKL
     class main
     disabled
     oneshot
 
-service iprenew_eth0 /system/bin/dhcpcd -n
+service iprenew_wlan0 /system/bin/dhcpcd -n
     class main
     disabled
     oneshot
@@ -185,7 +186,20 @@ service hciattach /system/bin/brcm_patchram_plus --enable_hci --enable_lpm \
     group bluetooth net_bt_admin
     disabled
 
+# for USB internet sharing
 service udhcpd /system/bin/udhcpd
+    disabled
+    oneshot
+
+service netsharing_on /system/bin/netsharing net on
+    disabled
+    oneshot
+
+service netsharing_off /system/bin/netsharing net off
+    disabled
+    oneshot
+
+service netsharing_pass /system/bin/netsharing net_pass on
     disabled
     oneshot
 
