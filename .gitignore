@@ -83,3 +83,11 @@ arch/arm/boot/compressed/lib1funcs.S
 arch/arm/boot/compressed/piggy.gzip
 
 arch/arm/boot/compressed/vmlinux
+
+mkboot.aosp/boot.img
+
+mkboot.aosp/zImage
+
+zip.aosp/boot.img
+
+zip.aosp/TwistedZero_leanKernel_184Mhz_AOSP.zip
