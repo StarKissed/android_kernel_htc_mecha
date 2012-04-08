@@ -17,11 +17,8 @@
 /dev/gemini0            0660    system      camera
 /dev/msm_camera/*       0660    system      camera
 /dev/pmem_camera*       0660    system      camera
-/dev/pmem_smipool*      0660    system      camera
 /dev/video*             0660    system      camera
-/dev/msm_vidc_dec       0660    system      audio
-/dev/msm_vidc_enc       0660    system      audio
-/dev/msm_vidc_reg       0660    system      audio
+/dev/msm_vidc*          0660    system      media
 
 #audio
 /dev/htc-acdb           0660    system      audio
@@ -30,6 +27,7 @@
 /dev/msm_pcm_lp_dec     0660    system      audio
 /dev/codec_aic3254      0660    system      audio
 /dev/pmem_audio         0660    system      audio
+/dev/pmem_smipool*      0660    system      audio
 /dev/gemini*	        0660    system      audio
 /dev/tpa2051d3          0660    system      audio
 /dev/pmem_adsp*         0660    system      audio
