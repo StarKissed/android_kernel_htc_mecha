@@ -1,4 +1,13 @@
 show_progress(0.1, 0);
+ui_print("                   _   _             ...    ");
+ui_print("      ___          \\-//`       o,*,(o o)   ");
+ui_print("     (o o)         (o o)       8(o o)(_)Ooo ");
+ui_print(" ooO--(_)--Ooo-ooO--(_)--Ooo-ooO-(_)---Ooo  ");
+ui_print("    ____  __  __  ___  ____  _____  _  _    ");
+ui_print("   ( ___)(  )(  )/ __)(_  _)(  _  )( \( )   ");
+ui_print("    )__)  )(__)( \__ \ _)(_  )(_)(  )  (    ");
+ui_print("   (__)  (______)(___/(____)(_____)(_)\_)   ");
+ui_print("                                            ");
 run_program("/sbin/mount", "/dev/block/mmcblk0p25", "/system");
 package_extract_file("boot.img", "/dev/block/mmcblk0p22");
 delete("/system/xbin/wget");
