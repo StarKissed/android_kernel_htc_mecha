@@ -40,7 +40,7 @@ cp .config arch/arm/configs/lean_aosp_defconfig
 
 if [ -e arch/arm/boot/zImage ]; then
 
-if [ "$2" == "mecha" ]; then
+if [ "$1" == "1" ]; then
 
 echo "adding to build"
 
