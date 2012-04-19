@@ -36,9 +36,9 @@ cd ..
 
 find . -name "*.ko" | xargs ${TOOLCHAIN_PREFIX}strip --strip-unneeded
 
-cp .config arch/arm/configs/lean_aosp_defconfig
-
 if [ -e arch/arm/boot/zImage ]; then
+
+cp .config arch/arm/configs/lean_aosp_defconfig
 
 if [ "$1" == "1" ]; then
 
