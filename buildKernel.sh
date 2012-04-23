@@ -20,10 +20,7 @@ zipfile=$HANDLE"_leanKernel_184Mhz_AOSP.zip"
 CPU_JOB_NUM=16
 TOOLCHAIN_PREFIX=arm-none-eabi-
 
-echo "Config Name? "
-ls config
-read configfile
-cp -R config/$configfile .config
+cp -R config/$2_config .config
 
 make clean -j$CPU_JOB_NUM
 
