@@ -13,7 +13,7 @@ DROIDGITHUB=TwistedUmbrella/Twisted-Playground.git
 MECHAREPO=/Volumes/android/github-aosp_source/android_device_htc_mecha
 MECHAGITHUB=ThePlayground/android_device_htc_mecha.git
 ICSREPO=/Volumes/android/github-aosp_source/android_system_core
-SPDTWKR=/Volumes/android/Twisted-Playground/ScriptFusion
+SPDTWKR=/Volumes/android/github-aosp_source/proprietary_vendor_twisted/twisted/sbin
 MSMREPO=/Volumes/android/github-aosp_source/android_device_htc_msm7x30-common
 zipfile=$HANDLE"_leanKernel_184Mhz_AOSP.zip"
 
