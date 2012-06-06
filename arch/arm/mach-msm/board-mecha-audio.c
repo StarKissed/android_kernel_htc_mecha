@@ -45,9 +45,9 @@ void mecha_back_mic_enable(int);
 
 static struct q5v2_hw_info q5v2_audio_hw[Q5V2_HW_COUNT] = {
 	[Q5V2_HW_HANDSET] = {
-		.max_gain[VOC_NB_INDEX] = 400,
+		.max_gain[VOC_NB_INDEX] = 600,
 		.min_gain[VOC_NB_INDEX] = -1600,
-		.max_gain[VOC_WB_INDEX] = 400,
+		.max_gain[VOC_WB_INDEX] = 600,
 		.min_gain[VOC_WB_INDEX] = -1600,
 	},
 	[Q5V2_HW_HEADSET] = {
