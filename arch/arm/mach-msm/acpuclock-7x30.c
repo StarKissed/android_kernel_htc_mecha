@@ -82,19 +82,6 @@ struct clkctl_acpu_speed {
 static struct clock_state drv_state = { 0 };
 
 static struct cpufreq_frequency_table freq_table[] = {
-#ifdef CONFIG_UNLOCK_184MHZ
-        { 0, 184320 },
-        { 1, 245760 },
-        { 2, 368640 },
-        { 3, 768000 },
-        { 4, 1024000 },
-        { 5, 1222400 },
-        { 6, 1408000 },
-        { 7, 1593600 },
-        { 8, 1766400 },
-        { 9, 1920000 },
-        { 10, CPUFREQ_TABLE_END },
-#else 
         { 0, 245760 },
         { 1, 368640 },
         { 2, 768000 },
@@ -105,33 +92,21 @@ static struct cpufreq_frequency_table freq_table[] = {
         { 7, 1766400 },
         { 8, 1920000 },
         { 9, CPUFREQ_TABLE_END },
-#endif
 };
 
 /* Use negative numbers for sources that can't be enabled/disabled */
 #define SRC_LPXO (-2)
 #define SRC_AXI  (-1)
 static struct clkctl_acpu_speed acpu_freq_tbl[] = {
-/*
-	{ 24576,  SRC_LPXO, 0, 0,  30720,  1000, VDD_RAW(1000) },
-	{ 61440,  PLL_3,    5, 11, 61440,  1000, VDD_RAW(1000) },
-	{ 122880, PLL_3,    5, 5,  61440,  1000, VDD_RAW(1000) },
-//	{ 184320, PLL_3,    5, 4,  61440,  1000, VDD_RAW(1000) },
-	{ MAX_AXI_KHZ, SRC_AXI, 1, 0, 61440, 1000, VDD_RAW(1000) },
-*/
-
-#ifdef CONFIG_UNLOCK_184MHZ
-	{ 184320, PLL_3,    5, 4,  61440,  900, VDD_RAW(900) },
-#endif
 	{ 245760, PLL_3,    5, 2,  61440,  975, VDD_RAW(975) },
-        { 368640, PLL_3,    5, 1,  122800, 1025, VDD_RAW(1025) },
+    { 368640, PLL_3,    5, 1,  122800, 1025, VDD_RAW(1025) },
 	{ 768000, PLL_1,    2, 0,  153600, 1075, VDD_RAW(1075) },
-	{ 1024000, PLL_2,    3, 0,  192000, 1100, VDD_RAW(1100) },
-	{ 1222400, PLL_2,    3, 0,  192000, 1150, VDD_RAW(1150) },
-	{ 1408000, PLL_2,    3, 0,  192000, 1250, VDD_RAW(1250) },
+	{ 1024000, PLL_2,   3, 0,  192000, 1100, VDD_RAW(1125) },
+	{ 1222400, PLL_2,   3, 0,  192000, 1150, VDD_RAW(1175) },
+	{ 1408000, PLL_2,   3, 0,  192000, 1250, VDD_RAW(1225) },
 	{ 1593600, PLL_2,   3, 0,  192000, 1325, VDD_RAW(1325) },
 	{ 1766400, PLL_2,   3, 0,  192000, 1375, VDD_RAW(1375) },
-        { 1920000, PLL_2,   3, 0,  192000, 1450, VDD_RAW(1450) },
+    { 1920000, PLL_2,   3, 0,  192000, 1450, VDD_RAW(1425) },
 	{ 0 }
 };
 static unsigned long max_axi_rate;
