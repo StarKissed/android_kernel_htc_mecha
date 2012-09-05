@@ -1122,9 +1122,3 @@ config USB_GADGET_DYNAMIC_ENDPOINT
 	default n
 
 endif # USB_GADGET
-
-config USB_HTC_SWITCH_STUB
-	bool "USB HTC function switch stub"
-	default n
-	help
-	  HTC usb_function_switch stub
