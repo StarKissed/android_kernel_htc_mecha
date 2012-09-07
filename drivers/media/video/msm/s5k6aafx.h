@@ -92,4 +92,3 @@ struct s5k6aafx_reg {
 };
 
 #endif /* S5K6AAFX_H */
-

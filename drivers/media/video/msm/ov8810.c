@@ -2809,4 +2809,3 @@ static int __init ov8810_init(void)
 }
 
 module_init(ov8810_init);
-

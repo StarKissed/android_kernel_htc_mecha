@@ -720,7 +720,7 @@ static int s5k4e1gx_probe_init_sensor(const struct msm_camera_sensor_info *data)
 
 
     /* Modified the Setting for different sensor revision */
-	if (sdata->csi_if) {
+	if (machine_is_saga()) {
 		printk("[CAM]use analog_settings_saga\n");
 		if (sdata->zero_shutter_mode)
 		rc = s5k4e1gx_i2c_write_table(
@@ -983,9 +983,7 @@ static int32_t s5k4e1gx_test(enum msm_s_test_mode mo)
 
 static void s5k4e1gx_extra_settings_for_mipi(enum msm_s_setting rt)
 {
-	struct msm_camera_sensor_info *sdata = s5k4e1_pdev->dev.platform_data;
-
-	if (sdata->csi_if) {
+	if (machine_is_saga()) {
 		if (rt == S_RES_PREVIEW) {
 			/* outif_enable[7], data_type[5:0](2Bh = bayer 10bit) */
 			s5k4e1gx_i2c_write_b(s5k4e1gx_client->addr, 0x30BF, 0xAB);
@@ -1039,7 +1037,7 @@ static int32_t s5k4e1gx_setting(enum msm_s_reg_update rupdate,
 	switch (rupdate) {
 	case S_UPDATE_PERIODIC:
 		/* 1126 for improve shutter of MIPI */
-		if ((sdata->csi_if) && sdata->zero_shutter_mode) {
+		if (machine_is_saga() && sdata->zero_shutter_mode) {
 		pr_info("[CAM]%s:return 0 (S_UPDATE_PERIODIC state)\n", __func__);
 			return 0;
 		}
@@ -1503,7 +1501,7 @@ static int s5k4e1gx_sensor_open_init(struct msm_camera_sensor_info *data)
 	}
 
 	/* 1126 for improve shutter of MIPI */
-	if (sinfo->csi_if) {
+	if (machine_is_saga()) {
 	pr_info("[CAM]%s: get s5k4e1gx_reg_zero_shutter setting\n", __func__);
 	memcpy(&(s5k4e1gx_reg_pat[S_RES_PREVIEW]),
 		&(s5k4e1gx_reg_zero_shutter[0]), sizeof(struct reg_struct));
@@ -1551,7 +1549,7 @@ static int s5k4e1gx_sensor_open_init(struct msm_camera_sensor_info *data)
 
 	/* Force reset MIPI sensor for SAGA */
 	/*1126 for improve shutter of MIPI*/
-	if ((sinfo->csi_if) && !data->zero_shutter_mode) {
+	if (machine_is_saga() && !data->zero_shutter_mode) {
 		rc = s5k4e1gx_probe_init_sensor(data);
 		if (rc < 0)
 			printk("[CAM]s5k4e1gx_sensor_open_init() call s5k4e1gx_probe_init_sensor() failed !!!\n");
@@ -1568,7 +1566,7 @@ static int s5k4e1gx_sensor_open_init(struct msm_camera_sensor_info *data)
 	if (s5k4e1gx_ctrl->prev_res == S_QTR_SIZE)
 		rc = s5k4e1gx_setting(S_REG_INIT, S_RES_PREVIEW);
 	else {/*1126 for improve shutter of MIPI*/
-		if ((sinfo->csi_if) && sinfo->zero_shutter_mode)
+		if (machine_is_saga() && sinfo->zero_shutter_mode)
 			rc = s5k4e1gx_setting(S_REG_INIT, S_RES_PREVIEW);
 		else
 			rc = s5k4e1gx_setting(S_REG_INIT, S_RES_CAPTURE);
