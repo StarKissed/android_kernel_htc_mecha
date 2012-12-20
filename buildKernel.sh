@@ -7,13 +7,13 @@
 PROPER=`echo $2 | sed 's/\([a-z]\)\([a-zA-Z0-9]*\)/\u\1\2/g'`
 
 HANDLE=TwistedZero
-KERNELSPEC=/Volumes/android/android-tzb_ics4.0.4/kernel/htc/mecha
+KERNELSPEC=/Volumes/android/android_kernel_htc_mecha
 KERNELREPO=/Users/TwistedZero/Public/Dropbox/TwistedServer/Playground/kernels
 EXTRASREPO=/Volumes/android/Playground-Ext_Pack/optional/kernel
-MECHAREPO=/Volumes/android/android-tzb_ics4.0.4/device/htc/mecha
-ICSREPO=/Volumes/android/android-tzb_ics4.0.4/system/core
+MECHAREPO=/Volumes/android/github-aosp_source/android_device_htc_mecha
+ICSREPO=/Volumes/android/github-aosp_source/android_system_core
 SPDTWKR=/Volumes/android/github-aosp_source/proprietary_vendor_twisted/twisted/sbin
-MSMREPO=/Volumes/android/android-tzb_ics4.0.4/device/htc/msm7x30-common
+MSMREPO=/Volumes/android/github-aosp_source/android_device_htc_msm7x30-common
 zipfile=$HANDLE"_baseKernel_184Mhz.zip"
 TOOLCHAIN_PREFIX=/Volumes/android/android-toolchain-eabi/bin/arm-eabi-
 
