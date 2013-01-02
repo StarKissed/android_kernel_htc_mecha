@@ -17,7 +17,7 @@ MSMREPO=/Volumes/android/github-aosp_source/android_device_htc_msm7x30-common
 zipfile=$HANDLE"_baseKernel_184Mhz.zip"
 TOOLCHAIN_PREFIX=/Volumes/android/android-toolchain-eabi/bin/arm-eabi-
 
-CPU_JOB_NUM=4
+CPU_JOB_NUM=8
 
 cp -R config/$2_config .config
 
