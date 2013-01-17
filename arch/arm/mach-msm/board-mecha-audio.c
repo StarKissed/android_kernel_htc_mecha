@@ -232,8 +232,8 @@ void mecha_snddev_imic_pamp_on(int en)
 		pmic_hsed_enable(PM_HSED_CONTROLLER_0, PM_HSED_ENABLE_ALWAYS);
 		mecha_back_mic_enable(1);
 	} else {
-		pmic_hsed_enable(PM_HSED_CONTROLLER_0, PM_HSED_ENABLE_OFF);
-		mecha_back_mic_enable(0);
+		pmic_hsed_enable(PM_HSED_CONTROLLER_0, PM_HSED_ENABLE_ALWAYS);
+		mecha_back_mic_enable(1);
 	}
 }
 
